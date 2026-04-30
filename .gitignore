@@ -1,0 +1,29 @@
+# Dependencias
+/node_modules
+.pnpm-debug.log*
+npm-debug.log*
+yarn-error.log*
+
+# Builds
+/dist
+/.angular
+/out-tsc
+/tmp
+/coverage
+
+# Variables sensibles
+.env
+.env.*
+!.env.example
+
+# IDE / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Test runners
+/connect.lock
+/libpeerconnection.log
+testem.log
