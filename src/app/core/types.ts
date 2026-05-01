@@ -1,4 +1,4 @@
-export type Role = 'admin' | 'hr' | 'evaluator' | 'hiring_manager';
+export type Role = 'admin' | 'hr' | 'evaluator' | 'hiring_manager' | 'worker';
 
 export interface MeResponse {
   user_id: string;
@@ -15,7 +15,88 @@ export interface Vacancy {
   public_slug: string;
   published_at: string;
   checklist_template_id: string;
+  role_manual_body?: string;
+  role_manual_file_id?: string;
   created_at: string;
+}
+
+export interface RoleManual {
+  vacancy_id: string;
+  body: string;
+  file_id?: string;
+}
+
+export interface DocumentType {
+  item_key: string;
+  label: string;
+  requires_vehicle: boolean;
+  typical_required: boolean;
+  max_age_days?: number | null;
+  requires_template: boolean;
+  requires_issued_at: boolean;
+  has_template: boolean;
+  template_file_id?: string;
+}
+
+export interface InductionOrgMedia {
+  id: string;
+  file_id: string;
+  kind: 'video' | 'image' | 'pdf' | 'audio';
+  title: string;
+  sort_order: number;
+  duration_seconds?: number;
+}
+
+export interface InductionOrgModuleEnriched extends InductionOrgModule {
+  media?: InductionOrgMedia[];
+  completed_at?: string;
+  viewed_seconds?: number;
+}
+
+export interface FunctionalActivity {
+  id: string;
+  phase: 'theory' | 'practice';
+  sort_order: number;
+  title: string;
+  description: string;
+  evidence_required: boolean;
+  evidence_notes: string;
+  completed_at?: string;
+  evidence_file_ids: string[];
+  audiovisual_file_id?: string;
+}
+
+export interface EndowmentDelivery {
+  id: string;
+  kind: 'epp' | 'dotacion';
+  items_json: { label?: string; [k: string]: unknown }[];
+  delivered_at: string;
+  signature_file_id?: string;
+}
+
+export interface OutboxMessage {
+  id: string;
+  channel: string;
+  to: string;
+  subject: string;
+  status: 'pending' | 'sent' | 'failed' | 'cancelled';
+  attempts: number;
+  last_error: string;
+  scheduled_for: string;
+  sent_at?: string;
+  created_at: string;
+}
+
+export interface OverdueApplication {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  status: string;
+  updated_at: string;
+  sla_max_days: number;
+  days_in_state: number;
+  overdue_by: number;
 }
 
 export interface ApplicationListItem {
@@ -50,6 +131,10 @@ export interface ApplicationDocument {
   reviewer_notes: string;
   file_id?: string;
   required: boolean;
+  issued_at?: string;
+  max_age_days?: number;
+  requires_template?: boolean;
+  requires_issued_at?: boolean;
 }
 
 export interface ApplicationDetail extends ApplicationListItem {

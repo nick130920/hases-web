@@ -6,9 +6,16 @@ import {
   ApplicationDetail,
   ApplicationListItem,
   Completeness,
+  DocumentType,
+  EndowmentDelivery,
+  FunctionalActivity,
   InductionOrgModule,
+  InductionOrgModuleEnriched,
   InterviewSession,
+  OutboxMessage,
+  OverdueApplication,
   RejectionReason,
+  RoleManual,
   User,
   Vacancy,
 } from './types';
@@ -65,9 +72,10 @@ export class ApiService {
   getCompleteness(id: string): Observable<Completeness> {
     return this.http.get<Completeness>(`${this.base}/applications/${id}/completeness`);
   }
-  uploadDocument(id: string, itemId: string, file: File) {
+  uploadDocument(id: string, itemId: string, file: File, issuedAt?: string) {
     const fd = new FormData();
     fd.append('file', file);
+    if (issuedAt) fd.append('issued_at', issuedAt);
     return this.http.post<{ file_id: string }>(
       `${this.base}/applications/${id}/documents/${itemId}/upload`,
       fd
@@ -123,13 +131,45 @@ export class ApiService {
       recommendations,
     });
   }
+  uploadIPSResultFile(applicationId: string, outcome: string, recommendations: string, file?: File) {
+    const fd = new FormData();
+    fd.append('outcome', outcome);
+    fd.append('recommendations', recommendations);
+    if (file) fd.append('file', file);
+    return this.http.patch(
+      `${this.base}/applications/${applicationId}/ips-result/upload`,
+      fd
+    );
+  }
 
   // ----- Inducción -----
-  listInductionModules(): Observable<InductionOrgModule[]> {
-    return this.http.get<InductionOrgModule[]>(`${this.base}/induction/org-modules`);
+  listInductionModules(): Observable<InductionOrgModuleEnriched[]> {
+    return this.http.get<InductionOrgModuleEnriched[]>(`${this.base}/induction/org-modules`);
   }
   createInductionModule(body: Partial<InductionOrgModule>) {
     return this.http.post<{ id: string }>(`${this.base}/induction/org-modules`, body);
+  }
+  uploadInductionMedia(
+    moduleId: string,
+    kind: string,
+    title: string,
+    file: File,
+    sortOrder = 0,
+    durationSeconds?: number
+  ) {
+    const fd = new FormData();
+    fd.append('kind', kind);
+    fd.append('title', title);
+    fd.append('sort_order', String(sortOrder));
+    if (durationSeconds != null) fd.append('duration_seconds', String(durationSeconds));
+    fd.append('file', file);
+    return this.http.post<{ id: string; file_id: string }>(
+      `${this.base}/induction/org-modules/${moduleId}/media`,
+      fd
+    );
+  }
+  deleteInductionMedia(mediaId: string) {
+    return this.http.delete(`${this.base}/induction/org-media/${mediaId}`);
   }
   markOrgProgress(applicationId: string, module_id: string) {
     return this.http.post(`${this.base}/applications/${applicationId}/induction/org-progress`, {
@@ -143,6 +183,12 @@ export class ApiService {
     return this.http.post(
       `${this.base}/applications/${applicationId}/induction/signatures`,
       fd
+    );
+  }
+  uploadInductionSignatureBase64(applicationId: string, kind: string, dataURI: string) {
+    return this.http.post(
+      `${this.base}/applications/${applicationId}/induction/signatures`,
+      { kind, signature_data: dataURI }
     );
   }
   completeInductionOrg(applicationId: string) {
@@ -224,5 +270,158 @@ export class ApiService {
   }
   deactivateUser(id: string) {
     return this.http.delete(`${this.base}/users/${id}`);
+  }
+
+  // ----- Catálogo de tipos de documento + plantillas -----
+  listDocumentTypes(): Observable<DocumentType[]> {
+    return this.http.get<DocumentType[]>(`${this.base}/document-types`);
+  }
+  uploadDocumentTemplate(itemKey: string, file: File) {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ file_id: string }>(
+      `${this.base}/document-templates/${itemKey}`,
+      fd
+    );
+  }
+  documentTemplateUrl(itemKey: string) {
+    return `${this.base}/public/document-templates/${itemKey}`;
+  }
+
+  // ----- Manual de funciones por cargo -----
+  getRoleManual(vacancyId: string): Observable<RoleManual> {
+    return this.http.get<RoleManual>(`${this.base}/vacancies/${vacancyId}/role-manual`);
+  }
+  patchRoleManual(vacancyId: string, body: string, file?: File) {
+    if (file) {
+      const fd = new FormData();
+      fd.append('body', body);
+      fd.append('file', file);
+      return this.http.patch(`${this.base}/vacancies/${vacancyId}/role-manual`, fd);
+    }
+    return this.http.patch(`${this.base}/vacancies/${vacancyId}/role-manual`, { body });
+  }
+
+  // ----- Cronograma funcional -----
+  listFunctionalActivities(applicationId: string): Observable<FunctionalActivity[]> {
+    return this.http.get<FunctionalActivity[]>(
+      `${this.base}/applications/${applicationId}/functional/activities`
+    );
+  }
+  listFunctionalActivityTemplates(vacancyId: string): Observable<FunctionalActivity[]> {
+    return this.http.get<FunctionalActivity[]>(
+      `${this.base}/vacancies/${vacancyId}/functional-activities`
+    );
+  }
+  createFunctionalActivityTemplate(
+    vacancyId: string,
+    body: {
+      phase: 'theory' | 'practice';
+      sort_order?: number;
+      title: string;
+      description?: string;
+      evidence_required?: boolean;
+    }
+  ) {
+    return this.http.post<{ id: string }>(
+      `${this.base}/vacancies/${vacancyId}/functional-activities`,
+      body
+    );
+  }
+  patchFunctionalActivityTemplate(tid: string, body: Record<string, unknown>) {
+    return this.http.patch(`${this.base}/functional-activity-templates/${tid}`, body);
+  }
+  deleteFunctionalActivityTemplate(tid: string) {
+    return this.http.delete(`${this.base}/functional-activity-templates/${tid}`);
+  }
+  completeFunctionalActivity(applicationId: string, activityId: string, notes: string, files?: File[]) {
+    if (files?.length) {
+      const fd = new FormData();
+      fd.append('notes', notes);
+      files.forEach((f) => fd.append('files', f));
+      return this.http.post(
+        `${this.base}/applications/${applicationId}/functional/activities/${activityId}/complete`,
+        fd
+      );
+    }
+    return this.http.post(
+      `${this.base}/applications/${applicationId}/functional/activities/${activityId}/complete`,
+      { notes }
+    );
+  }
+
+  // ----- Decisión de hiring -----
+  hiringDecision(applicationId: string, decision: 'hire' | 'reject', reason_id?: number, notes?: string) {
+    return this.http.post<{ status: string; invitation_token?: string }>(
+      `${this.base}/applications/${applicationId}/hiring-decision`,
+      { decision, reason_id: reason_id ?? null, notes: notes ?? '' }
+    );
+  }
+
+  // ----- Invitar al portal del worker -----
+  inviteApplicationToPortal(applicationId: string) {
+    return this.http.post<{ invitation_token: string }>(
+      `${this.base}/applications/${applicationId}/invite`,
+      {}
+    );
+  }
+
+  // ----- Dotación / EPP -----
+  recordEndowmentDelivery(
+    applicationId: string,
+    kind: 'epp' | 'dotacion',
+    items: unknown[],
+    signature?: File
+  ) {
+    if (signature) {
+      const fd = new FormData();
+      fd.append('kind', kind);
+      fd.append('items', JSON.stringify(items));
+      fd.append('signature', signature);
+      return this.http.post(`${this.base}/applications/${applicationId}/endowment-delivery`, fd);
+    }
+    return this.http.post(`${this.base}/applications/${applicationId}/endowment-delivery`, {
+      kind,
+      items,
+    });
+  }
+  listEndowmentDeliveries(applicationId: string): Observable<EndowmentDelivery[]> {
+    return this.http.get<EndowmentDelivery[]>(
+      `${this.base}/applications/${applicationId}/endowment-deliveries`
+    );
+  }
+
+  // ----- Outbox / Notificaciones -----
+  listOutbox(filters: { status?: string; channel?: string } = {}): Observable<OutboxMessage[]> {
+    const params: Record<string, string> = {};
+    if (filters.status) params['status'] = filters.status;
+    if (filters.channel) params['channel'] = filters.channel;
+    return this.http.get<OutboxMessage[]>(`${this.base}/admin/outbox`, { params });
+  }
+  retryOutbox(id: string) {
+    return this.http.post(`${this.base}/admin/outbox/${id}/retry`, {});
+  }
+
+  // ----- SLA / atrasados -----
+  listOverdueApplications(): Observable<OverdueApplication[]> {
+    return this.http.get<OverdueApplication[]>(`${this.base}/applications/overdue`);
+  }
+
+  // ----- Reportes ampliados -----
+  reportPipelineTimeUrl(): string {
+    return `${this.base}/reports/pipeline-time.csv`;
+  }
+  reportIPSMonthlyUrl(): string {
+    return `${this.base}/reports/ips-monthly.csv`;
+  }
+  reportOnboardingCompletedUrl(from?: string, to?: string): string {
+    const qs = new URLSearchParams();
+    if (from) qs.set('from', from);
+    if (to) qs.set('to', to);
+    const tail = qs.toString() ? `?${qs.toString()}` : '';
+    return `${this.base}/reports/onboarding-completed.csv${tail}`;
+  }
+  reportApplicationsUrl(): string {
+    return `${this.base}/reports/applications.csv`;
   }
 }

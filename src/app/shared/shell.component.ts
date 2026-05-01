@@ -29,9 +29,11 @@ import { AuthService } from '../core/auth.service';
         <a routerLink="/applications" routerLinkActive="is-active">Postulaciones</a>
         <a routerLink="/interviews" routerLinkActive="is-active">Entrevistas</a>
         <a routerLink="/induction" routerLinkActive="is-active">Inducción</a>
+        <a routerLink="/reports" routerLinkActive="is-active">Reportes</a>
         <ng-container *ngIf="auth.hasRole('admin')">
           <a routerLink="/admin/users" routerLinkActive="is-active">Usuarios</a>
           <a routerLink="/admin/catalog" routerLinkActive="is-active">Catálogos</a>
+          <a routerLink="/admin/outbox" routerLinkActive="is-active">Notificaciones</a>
         </ng-container>
       </nav>
 

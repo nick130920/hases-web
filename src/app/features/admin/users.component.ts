@@ -31,6 +31,7 @@ import { User } from '../../core/types';
             <option value="evaluator">Evaluador</option>
             <option value="hiring_manager">Hiring manager</option>
             <option value="admin">Admin</option>
+            <option value="worker">Trabajador (portal)</option>
           </select>
         </label>
         <label>
