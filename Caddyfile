@@ -3,26 +3,33 @@
 root * dist/web/browser
 encode gzip zstd
 
-# 404 explicito para assets estaticos inexistentes; evita que Caddy
-# devuelva index.html como fallback y el navegador intente parsear HTML
-# como modulo JS, lo que dejaba chunks lazy-load colgados.
-@missingAsset {
-	path *.js *.css *.map *.json *.woff *.woff2 *.ttf *.eot *.svg *.ico *.png *.jpg *.jpeg *.gif *.webp *.avif *.txt
-	not file
-}
-respond @missingAsset 404
-
-# Assets con hash (Angular outputHashing: all): cache inmutable un anio.
+# Cache: assets con hash (Angular outputHashing: all) -> inmutable un anio.
 @hashedAsset path *.js *.css *.woff *.woff2 *.svg *.png *.jpg *.jpeg *.gif *.webp *.avif *.ico
 header @hashedAsset Cache-Control "public, max-age=31536000, immutable"
 
-# index.html y rutas SPA: nunca cachear, apuntan a chunks que cambian en cada deploy.
+# Cache: index.html y rutas SPA -> nunca cachear, deben revalidar siempre
+# porque apuntan a chunks con hash que cambian con cada deploy.
 @spa {
 	not path *.js *.css *.map *.json *.woff *.woff2 *.ttf *.eot *.svg *.ico *.png *.jpg *.jpeg *.gif *.webp *.avif *.txt
 }
 header @spa Cache-Control "no-cache, no-store, must-revalidate"
 header @spa Pragma "no-cache"
 
-# Fallback SPA para rutas de Angular (deep links como /login, /portal/inicio).
-try_files {path} /index.html
-file_server
+# Bloque route: respeta el orden literal y evita que try_files se aplique
+# antes de devolver 404 a un asset estatico inexistente.
+route {
+	@missingAsset {
+		path *.js *.css *.map *.json *.woff *.woff2 *.ttf *.eot *.svg *.ico *.png *.jpg *.jpeg *.gif *.webp *.avif *.txt
+		not file
+	}
+	# 404 explicito para chunks que ya no existen tras un deploy. Antes
+	# Caddy servia index.html con content-type text/html, lo que rompia
+	# el bloqueo de MIME estricto del navegador para modulos JS y dejaba
+	# el lazy load colgado (sintoma: login se queda "Ingresando...").
+	respond @missingAsset 404
+
+	# Fallback SPA solo para rutas Angular sin extension (deep links).
+	try_files {path} /index.html
+
+	file_server
+}
