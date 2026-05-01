@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MeResponse, Role } from './types';
 
@@ -25,10 +25,13 @@ export class AuthService {
   login(email: string, password: string): Observable<LoginResponse> {
     const url = `${environment.apiUrl}/auth/login`;
     return this.http.post<LoginResponse>(url, { email, password }).pipe(
-      tap((res) => {
-        localStorage.setItem(this.storageKey, res.token);
-        this.refreshMe().subscribe({ error: () => {} });
-      })
+      tap((res) => localStorage.setItem(this.storageKey, res.token)),
+      switchMap((res) =>
+        this.refreshMe().pipe(
+          map(() => res),
+          catchError(() => of(res))
+        )
+      )
     );
   }
 
