@@ -53,10 +53,13 @@ export class PortalLoginComponent {
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/portal/inicio';
-        this.router.navigateByUrl(returnUrl);
+        this.router.navigateByUrl(returnUrl).finally(() => (this.loading = false));
       },
-      error: () => {
-        this.error = 'Credenciales inválidas';
+      error: (err) => {
+        this.error =
+          err?.status === 401 || err?.status === 403
+            ? 'Credenciales inválidas'
+            : 'No se pudo iniciar sesión. Intenta de nuevo.';
         this.loading = false;
       },
     });

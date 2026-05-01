@@ -1,0 +1,28 @@
+:{$PORT:8080}
+
+root * dist/web/browser
+encode gzip zstd
+
+# 404 explicito para assets estaticos inexistentes; evita que Caddy
+# devuelva index.html como fallback y el navegador intente parsear HTML
+# como modulo JS, lo que dejaba chunks lazy-load colgados.
+@missingAsset {
+	path *.js *.css *.map *.json *.woff *.woff2 *.ttf *.eot *.svg *.ico *.png *.jpg *.jpeg *.gif *.webp *.avif *.txt
+	not file
+}
+respond @missingAsset 404
+
+# Assets con hash (Angular outputHashing: all): cache inmutable un anio.
+@hashedAsset path *.js *.css *.woff *.woff2 *.svg *.png *.jpg *.jpeg *.gif *.webp *.avif *.ico
+header @hashedAsset Cache-Control "public, max-age=31536000, immutable"
+
+# index.html y rutas SPA: nunca cachear, apuntan a chunks que cambian en cada deploy.
+@spa {
+	not path *.js *.css *.map *.json *.woff *.woff2 *.ttf *.eot *.svg *.ico *.png *.jpg *.jpeg *.gif *.webp *.avif *.txt
+}
+header @spa Cache-Control "no-cache, no-store, must-revalidate"
+header @spa Pragma "no-cache"
+
+# Fallback SPA para rutas de Angular (deep links como /login, /portal/inicio).
+try_files {path} /index.html
+file_server
