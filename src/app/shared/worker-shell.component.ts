@@ -8,30 +8,48 @@ import { AuthService } from '../core/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
   template: `
-    <header class="brand-header">
-      <div class="brand-header__inner shell-topbar">
-        <div>
-          <p class="brand-header__name">Portal del trabajador · HASES</p>
-          <p class="brand-header__tagline">Tu proceso de ingreso paso a paso</p>
+    <div class="worker-shell">
+      <header class="brand-header">
+        <div class="brand-header__inner">
+          <div class="brand-header__logo" aria-hidden="true">H</div>
+          <div style="flex:1; min-width:0;">
+            <p class="brand-header__name">Portal del trabajador</p>
+            <p class="brand-header__tagline">HASES · Tu ingreso paso a paso</p>
+          </div>
+          <button
+            *ngIf="auth.user()"
+            class="shell-topbar__logout"
+            type="button"
+            (click)="logout()"
+          >
+            <span class="icon icon--sm">logout</span>
+            Salir
+          </button>
         </div>
-        <div class="shell-topbar__user" *ngIf="auth.user() as u">
-          <span class="shell-topbar__user-email">{{ u.email }}</span>
-          <button class="shell-topbar__logout" type="button" (click)="logout()">Salir</button>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <div class="shell-layout">
-      <nav class="shell-side">
-        <a routerLink="/portal/inicio" routerLinkActive="is-active">Inicio</a>
-        <a routerLink="/portal/documentos" routerLinkActive="is-active">Documentos</a>
-        <a routerLink="/portal/induccion" routerLinkActive="is-active">Inducción</a>
-        <a routerLink="/portal/funcional" routerLinkActive="is-active">Plan funcional</a>
-      </nav>
-
-      <main class="shell-main">
+      <main class="worker-shell__main">
         <router-outlet />
       </main>
+
+      <nav class="worker-shell__nav" aria-label="Navegación del portal">
+        <a routerLink="/portal/inicio" routerLinkActive="is-active">
+          <span class="icon">home</span>
+          Inicio
+        </a>
+        <a routerLink="/portal/documentos" routerLinkActive="is-active">
+          <span class="icon">folder_shared</span>
+          Documentos
+        </a>
+        <a routerLink="/portal/induccion" routerLinkActive="is-active">
+          <span class="icon">school</span>
+          Inducción
+        </a>
+        <a routerLink="/portal/funcional" routerLinkActive="is-active">
+          <span class="icon">construction</span>
+          Funcional
+        </a>
+      </nav>
     </div>
   `,
 })

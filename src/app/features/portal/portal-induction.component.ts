@@ -12,65 +12,83 @@ type SignatureKind = 'regulation' | 'policies' | 'contract';
   standalone: true,
   imports: [CommonModule, MediaPlayerComponent, SignaturePadComponent],
   template: `
-    <section class="page">
-      <header class="page-head">
-        <h1>Inducción organizacional</h1>
-        <p class="page-subtitle">
-          Revisa los módulos en orden y firma cada documento al final.
-        </p>
-      </header>
+    <header class="page-head">
+      <h1 style="font-size: 1.5rem;">Inducción organizacional</h1>
+      <p class="page-subtitle">
+        Revisa los módulos en orden y firma cada documento al final.
+      </p>
+    </header>
 
-      <p class="success" *ngIf="ok">{{ ok }}</p>
-      <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="ok">{{ ok }}</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
 
-      <article class="card" *ngFor="let m of modules()">
-        <h2>{{ m.sort_order }}. {{ m.title }}</h2>
-        <p>{{ m.body }}</p>
+    <article class="card" *ngFor="let m of modules()">
+      <div class="card-section-head">
+        <h2>
+          <span class="badge badge--soft">{{ m.sort_order }}</span>
+          {{ m.title }}
+        </h2>
+        <span
+          class="badge badge--success"
+          *ngIf="m.completed_at"
+        >
+          <span class="icon icon--sm">check_circle</span>
+          Visto
+        </span>
+      </div>
+      <p class="page-subtitle" style="line-height: 1.6; margin-bottom: 12px;">
+        {{ m.body }}
+      </p>
 
-        <ng-container *ngIf="m.media?.length; else noMedia">
-          <app-media-player
-            *ngFor="let media of m.media"
-            [media]="media"
-            [src]="api.fileUrl(media.file_id)"
-            (progress)="onProgress(m, $event)"
-            (completed)="onCompleted(m)"
-          />
-        </ng-container>
-        <ng-template #noMedia><p class="muted">Este módulo no incluye media.</p></ng-template>
+      <ng-container *ngIf="m.media?.length; else noMedia">
+        <app-media-player
+          *ngFor="let media of m.media"
+          [media]="media"
+          [src]="api.fileUrl(media.file_id)"
+          (progress)="onProgress(m, $event)"
+          (completed)="onCompleted(m)"
+        />
+      </ng-container>
+      <ng-template #noMedia>
+        <p class="muted">Este módulo no incluye material audiovisual.</p>
+      </ng-template>
 
-        <p>
-          <span class="badge" *ngIf="m.completed_at">Visto el {{ m.completed_at }}</span>
-          <button class="btn btn--ghost" (click)="markSeen(m)" *ngIf="!m.completed_at">
-            Marcar como visto
-          </button>
-        </p>
-      </article>
+      <div class="form-actions" *ngIf="!m.completed_at">
+        <button class="btn btn--ghost" (click)="markSeen(m)">
+          <span class="icon icon--sm">visibility</span>
+          Marcar como visto
+        </button>
+      </div>
+    </article>
 
-      <article class="card">
+    <article class="card card--accent">
+      <div class="card-section-head">
         <h2>Firmas</h2>
-        <p class="page-subtitle">
-          Selecciona el documento, lee el contenido y firma con tu dedo o el mouse.
-        </p>
-        <div class="signature-grid">
-          <button
-            *ngFor="let kind of kinds"
-            class="btn"
-            [class.btn--primary]="activeSig === kind"
-            [class.btn--ghost]="activeSig !== kind"
-            (click)="activeSig = kind"
-          >
-            {{ kindLabel(kind) }}
-          </button>
-        </div>
-        <ng-container *ngIf="activeSig">
-          <app-signature-pad
-            [hint]="'Firma del ' + kindLabel(activeSig)"
-            [confirmLabel]="'Enviar firma de ' + kindLabel(activeSig)"
-            (signed)="signWith(activeSig, $event)"
-          />
-        </ng-container>
-      </article>
-    </section>
+      </div>
+      <p class="page-subtitle">
+        Selecciona el documento, lee el contenido y firma con tu dedo o el mouse.
+      </p>
+      <div class="row" style="gap: 8px; margin: 14px 0 18px;">
+        <button
+          *ngFor="let kind of kinds"
+          class="btn"
+          [class.btn--primary]="activeSig === kind"
+          [class.btn--ghost]="activeSig !== kind"
+          type="button"
+          (click)="activeSig = kind"
+        >
+          <span class="icon icon--sm">draw</span>
+          {{ kindLabel(kind) }}
+        </button>
+      </div>
+      <ng-container *ngIf="activeSig">
+        <app-signature-pad
+          [hint]="'Firma del ' + kindLabel(activeSig)"
+          [confirmLabel]="'Enviar firma de ' + kindLabel(activeSig)"
+          (signed)="signWith(activeSig, $event)"
+        />
+      </ng-container>
+    </article>
   `,
 })
 export class PortalInductionComponent implements OnInit {

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HASES Ingeniería - Ingreso Sistema RRHH</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#612e1b",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f7faf8",
+                        "on-primary-fixed": "#00201c",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#7d4430",
+                        "secondary-fixed": "#9af6b6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#370e02",
+                        "on-surface": "#191c1b",
+                        "primary-fixed-dim": "#8ed3c7",
+                        "surface-container-low": "#f2f4f2",
+                        "on-surface-variant": "#3f4946",
+                        "surface-bright": "#f7faf8",
+                        "inverse-surface": "#2d3130",
+                        "primary-container": "#0e5e54",
+                        "secondary-container": "#97f3b3",
+                        "secondary-fixed-dim": "#7ed99b",
+                        "inverse-on-surface": "#eff1ef",
+                        "on-secondary-container": "#05723e",
+                        "surface-dim": "#d8dbd9",
+                        "tertiary-fixed-dim": "#ffb59c",
+                        "surface-variant": "#e0e3e1",
+                        "surface-container": "#eceeec",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#005047",
+                        "on-tertiary-fixed-variant": "#6e3825",
+                        "primary-fixed": "#aaf0e2",
+                        "surface-container-high": "#e6e9e7",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-container-highest": "#e0e3e1",
+                        "outline-variant": "#bec9c5",
+                        "on-secondary-fixed-variant": "#00522b",
+                        "on-primary": "#ffffff",
+                        "surface": "#f7faf8",
+                        "secondary": "#006d3b",
+                        "inverse-primary": "#8ed3c7",
+                        "on-primary-container": "#8fd5c8",
+                        "on-tertiary-container": "#ffb69e",
+                        "on-secondary-fixed": "#00210e",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1b",
+                        "outline": "#6f7976",
+                        "surface-tint": "#1f695f",
+                        "primary": "#00453d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "14px",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "16px",
+                        "md": "24px",
+                        "lg": "48px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "xl": "80px",
+                        "margin": "32px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "h1": ["Plus Jakarta Sans"],
+                        "h2": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .organic-gradient {
+            background: linear-gradient(135deg, #0e5e54 0%, #2d8a54 100%);
+        }
+        .pattern-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 30c0-16.57 13.43-30 30-30v60c-16.57 0-30-13.43-30-30z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-[#eef3f1] font-body-md text-on-background min-h-screen flex flex-col">
+<!-- Header Section: Shared TopAppBar Logic applied to specific User Requirements -->
+<header class="bg-primary-container text-white w-full z-50 shadow-sm">
+<div class="max-w-[1280px] mx-auto px-6 py-4 flex flex-col items-center justify-center text-center">
+<h1 class="font-h1 text-[20px] font-extrabold tracking-tight">HASES Ingeniería</h1>
+<p class="font-label-caps text-[10px] tracking-[0.2em] mt-1 opacity-90">
+                ASEO · JARDINERÍA · PISCINAS · APOYO OPERATIVO · SOSTENIBILIDAD
+            </p>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex items-center justify-center p-gutter">
+<div class="w-full max-w-[1100px] grid grid-cols-1 md:grid-cols-2 bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(14,94,84,0.08)] border border-outline-variant/30">
+<!-- LEFT COLUMN: Illustrative decorative panel -->
+<div class="organic-gradient relative p-lg flex flex-col justify-between overflow-hidden hidden md:flex">
+<div class="pattern-overlay absolute inset-0"></div>
+<!-- Operación en verde badge -->
+<div class="relative z-10">
+<div class="inline-flex items-center gap-2 bg-secondary-container/20 backdrop-blur-md border border-white/20 rounded-full px-4 py-2">
+<span class="material-symbols-outlined text-secondary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-caps text-white text-[10px]">OPERACIÓN EN VERDE</span>
+</div>
+</div>
+<div class="relative z-10 mt-auto">
+<blockquote class="text-white">
+<p class="font-h2 text-white italic font-light leading-snug">
+                            "Liderando la eficiencia operativa con un compromiso inquebrantable por la sostenibilidad y la confianza técnica."
+                        </p>
+<footer class="mt-4 flex items-center gap-3">
+<div class="h-1 w-8 bg-secondary-fixed"></div>
+<span class="font-label-caps tracking-widest text-white/80">GESTIÓN HUMANA</span>
+</footer>
+</blockquote>
+</div>
+<!-- Abstract graphic element -->
+<div class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -top-20 -left-20 w-64 h-64 bg-secondary-fixed/10 rounded-full blur-3xl"></div>
+</div>
+<!-- RIGHT COLUMN: Elevated Login Card -->
+<div class="p-lg flex flex-col justify-center bg-white">
+<div class="max-w-sm mx-auto w-full">
+<header class="mb-gutter">
+<h2 class="font-h2 text-primary-container mb-2">Ingreso</h2>
+<p class="font-body-md text-outline">Acceda al portal de gestión para colaboradores y servicios técnicos.</p>
+</header>
+<form class="space-y-sm">
+<div class="space-y-xs">
+<label class="block font-label-caps text-on-surface-variant uppercase text-[11px]" for="email">CORREO ELECTRÓNICO</label>
+<input class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-bright focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary transition-all font-body-md" id="email" name="email" placeholder="usuario@hases.com" type="email"/>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-caps text-on-surface-variant uppercase text-[11px]" for="password">CONTRASEÑA</label>
+<div class="relative">
+<input class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-bright focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary transition-all font-body-md" id="password" name="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-outline" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between pt-base">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-outline-variant text-primary focus:ring-primary-fixed" type="checkbox"/>
+<span class="text-[13px] text-on-surface-variant">Recordarme</span>
+</label>
+<a class="text-[13px] font-semibold text-primary hover:underline transition-all" href="#">¿Olvidó su clave?</a>
+</div>
+<button class="w-full mt-gutter bg-primary-container hover:bg-primary text-white font-bold py-4 rounded-lg shadow-lg shadow-primary-container/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2" type="submit">
+<span>INGRESAR AL SISTEMA</span>
+<span class="material-symbols-outlined text-[18px]">login</span>
+</button>
+</form>
+<footer class="mt-lg pt-md border-t border-surface-container-high flex flex-col gap-4">
+<div class="flex items-center justify-center gap-6">
+<img alt="ISO Logo" class="h-8 opacity-40 grayscale hover:grayscale-0 transition-all" data-alt="A clean, minimalist monochrome version of a professional ISO certification quality seal. The mark is displayed against a pure white background, emphasizing industrial standards and technical excellence. Soft high-key lighting ensures the emblem looks official and high-quality, fitting a corporate engineering brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKqnmIgB6QDqFxgS70n1aRfHmhx_JcIHpds9MMP6qTTVXmIpExDAmtym4aEo25BKcqiuLitztX-X63dNoZGvk2ZFnRh4ifn_9ea1AcXVRcr4Ol8ja09KaD7TJNwUqIwOjeanRymoz95Q-ekvkokYyrdhPU4MnN_R4ZrRcyw7D5lcskItcpC8CO6K4EOp63lzv4BzPsQSrgmF1-hcW-3zvLL11Bmh6DpGc2wkUJmjmrv_aQdkrGOI3BCNZRmyzBfDQAPsJIwK0qCY_X"/>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<img alt="Security Logo" class="h-8 opacity-40 grayscale hover:grayscale-0 transition-all" data-alt="A sophisticated security verification badge with a shield icon, rendered in a modern clean line style. The visual uses a minimalist palette of soft grays to represent data protection and digital trust. It is presented in a bright, modern lighting environment to align with a professional HR management software interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKOF6IwSG_fLXs-zYkU3ynEAzo1-OuW_wvWPFE22OaH9MAh8cZJAxOMT2D08XZnXnPDFmyXjCUQWlA0OFKPRqZjhtxwj6fhCunS2DdUu6W9rfeAaii7Y2csodk4ymr76RMx38OxY65HryBcEx-JdVTifBXk98N-UHSt6N3_Pz0F1W6QDsY60yZVqIZqHJw6hPZe3tMaj1ZHS8z6z_AbXP1xOQLTMh7Po9fw1hWuUXWeFofJ36fIHfpLRj4nLKUCZvPHXzQT3Ilmixi"/>
+</div>
+<p class="text-[11px] text-center text-outline-variant font-medium">
+                            HASES INGENIERÍA © 2024 · PROTECCIÓN DE DATOS PERSONALES
+                        </p>
+</footer>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer: Shared Component Pattern -->
+<footer class="w-full py-4 bg-slate-50 border-t border-slate-200">
+<div class="max-w-[1280px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="text-[12px] font-['Plus_Jakarta_Sans'] text-slate-500">© 2024 HASES Ingeniería - Operación en Verde</span>
+<div class="flex gap-6">
+<a class="text-[12px] text-slate-500 hover:text-teal-600 transition-colors" href="#">Soporte Técnico</a>
+<a class="text-[12px] text-slate-500 hover:text-teal-600 transition-colors" href="#">Política de Privacidad</a>
+</div>
+</div>
+</footer>
+</body></html>

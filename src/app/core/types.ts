@@ -203,3 +203,42 @@ export const PIPELINE_STATUSES: { value: string; label: string }[] = [
 export function statusLabel(value: string): string {
   return PIPELINE_STATUSES.find((s) => s.value === value)?.label ?? value;
 }
+
+/**
+ * Devuelve la clase modificadora de `.badge` para colorear según la fase
+ * del pipeline. Mantenemos los códigos de color del DESIGN.md (gris para
+ * inicial, teal para documental, verde acento para entrevista/inducción,
+ * teal lleno para onboarding y rojo para descartes).
+ */
+export function statusBadgeClass(value: string): string {
+  switch (value) {
+    case 'applied':
+    case 'docs_pending':
+    case 'docs_incomplete':
+      return 'badge--status-applied';
+    case 'docs_review':
+    case 'docs_approved':
+      return 'badge--status-docs';
+    case 'interview_pending':
+    case 'interview_done':
+    case 'occ_pending':
+    case 'occ_sent':
+    case 'occ_result_received':
+      return 'badge--status-interview';
+    case 'hiring_pending':
+      return 'badge--status-decision';
+    case 'hired':
+    case 'induction_org':
+    case 'induction_org_done':
+    case 'induction_theory':
+    case 'induction_epp_pending':
+    case 'induction_practice':
+      return 'badge--status-induction';
+    case 'onboarding_complete':
+      return 'badge--status-onboarding';
+    case 'rejected':
+      return 'badge--status-rejected';
+    default:
+      return '';
+  }
+}

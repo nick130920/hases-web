@@ -9,30 +9,89 @@ import { AuthService } from '../../core/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <header class="brand-header">
-      <div class="brand-header__inner">
-        <p class="brand-header__name">Portal del trabajador · HASES</p>
-        <p class="brand-header__tagline">Continúa tu proceso de ingreso</p>
-      </div>
-    </header>
-    <div class="login-page">
-      <div class="login-card">
-        <h1 class="login-card__title">Ingreso al portal</h1>
-        <p class="login-card__lead">Accede con tu correo y la contraseña que definiste.</p>
-        <form (ngSubmit)="submit()">
-          <label for="we">Correo</label>
-          <input id="we" name="email" [(ngModel)]="email" type="email" autocomplete="username" required />
-          <label for="wp">Contraseña</label>
-          <input id="wp" name="password" [(ngModel)]="password" type="password" autocomplete="current-password" required />
-          <button type="submit" [disabled]="loading">
-            {{ loading ? 'Ingresando…' : 'Entrar' }}
-          </button>
-          <p class="login-card__error" *ngIf="error">{{ error }}</p>
-        </form>
-        <p class="login-card__footer-nav">
-          ¿Recibiste un código de invitación?
-          <a routerLink="/portal/aceptar-invitacion">Activar mi cuenta</a>
-        </p>
+    <div class="auth-page">
+      <header class="brand-header">
+        <div class="brand-header__inner">
+          <div class="brand-header__logo" aria-hidden="true">H</div>
+          <div>
+            <p class="brand-header__name">Portal del trabajador · HASES</p>
+            <p class="brand-header__tagline">Continúa tu proceso de ingreso</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="auth-page__main">
+        <div class="auth-card">
+          <aside class="auth-card__panel" aria-hidden="true">
+            <span class="auth-card__badge">
+              <span class="icon icon--filled icon--sm">badge</span>
+              Tu portal personal
+            </span>
+
+            <blockquote class="auth-card__quote">
+              <p>
+                "Aquí cargas tus documentos, ves tu inducción y haces seguimiento
+                a tu proceso de vinculación con HASES."
+              </p>
+              <footer>Tu ingreso, paso a paso</footer>
+            </blockquote>
+          </aside>
+
+          <div class="auth-card__form">
+            <div class="auth-card__brand">
+              <div class="brand-header__logo" aria-hidden="true">H</div>
+              <div>
+                <div class="auth-card__brand-name">Portal del trabajador</div>
+                <div class="auth-card__brand-tag">HASES Ingeniería</div>
+              </div>
+            </div>
+
+            <h1 class="auth-card__title">Ingreso al portal</h1>
+            <p class="auth-card__lead">
+              Accede con tu correo y la contraseña que definiste al activar tu cuenta.
+            </p>
+
+            <form (ngSubmit)="submit()">
+              <div class="auth-card__field">
+                <label for="we">Correo electrónico</label>
+                <input
+                  id="we"
+                  name="email"
+                  [(ngModel)]="email"
+                  type="email"
+                  autocomplete="username"
+                  placeholder="tucorreo@ejemplo.com"
+                  required
+                />
+              </div>
+
+              <div class="auth-card__field">
+                <label for="wp">Contraseña</label>
+                <input
+                  id="wp"
+                  name="password"
+                  [(ngModel)]="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <button class="auth-card__submit" type="submit" [disabled]="loading">
+                <span>{{ loading ? 'Ingresando…' : 'Entrar al portal' }}</span>
+                <span class="icon icon--sm" *ngIf="!loading">login</span>
+              </button>
+
+              <p class="auth-card__error" *ngIf="error">{{ error }}</p>
+            </form>
+
+            <p class="auth-card__footer-nav">
+              ¿Recibiste un código de invitación?
+              <a routerLink="/portal/aceptar-invitacion">Activar mi cuenta</a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   `,

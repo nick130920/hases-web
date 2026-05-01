@@ -21,11 +21,13 @@ interface QuestionDraft {
       <header class="page-head">
         <h1>Plantillas de entrevista</h1>
         <p class="page-subtitle">
-          Crea plantillas reutilizables. Las sesiones se asocian a postulaciones desde el detalle.
+          Crea plantillas reutilizables. Las sesiones se asocian a postulaciones
+          desde el detalle de cada candidato.
         </p>
       </header>
 
-      <form class="card form-grid" (ngSubmit)="createTemplate()">
+      <form class="card card--accent form-grid" (ngSubmit)="createTemplate()">
+        <h2 class="form-grid__full" style="margin:0;">Nueva plantilla</h2>
         <label class="form-grid__full">
           Título
           <input [(ngModel)]="form.title" name="title" required />
@@ -38,15 +40,23 @@ interface QuestionDraft {
           </select>
         </label>
         <div class="form-actions">
-          <button class="btn btn--primary" type="submit">Crear plantilla</button>
+          <button class="btn btn--primary" type="submit">
+            <span class="icon icon--sm">add</span>
+            Crear plantilla
+          </button>
         </div>
-        <p class="success" *ngIf="lastTemplateId">
+        <p class="success form-grid__full" *ngIf="lastTemplateId">
           Creada con id: <code>{{ lastTemplateId }}</code>
         </p>
       </form>
 
-      <article class="card" *ngIf="lastTemplateId">
-        <h2>Agregar preguntas a {{ lastTemplateId }}</h2>
+      <article class="card card--accent-soft" *ngIf="lastTemplateId">
+        <div class="card-section-head">
+          <h2>Agregar preguntas</h2>
+          <span class="badge badge--soft" *ngIf="addedCount > 0">
+            {{ addedCount }} pregunta(s)
+          </span>
+        </div>
         <div class="form-grid">
           <label>
             Sección
@@ -70,12 +80,10 @@ interface QuestionDraft {
           </label>
           <div class="form-actions">
             <button class="btn btn--primary" type="button" (click)="addQuestion()">
+              <span class="icon icon--sm">add</span>
               Agregar pregunta
             </button>
           </div>
-          <p class="success form-grid__full" *ngIf="addedCount > 0">
-            Preguntas agregadas: {{ addedCount }}
-          </p>
         </div>
       </article>
     </section>

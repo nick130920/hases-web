@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Postulaciones - HASES Ingeniería</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#6f7976",
+                      "on-secondary-container": "#05723e",
+                      "on-surface": "#191c1b",
+                      "on-primary-container": "#8fd5c8",
+                      "secondary-fixed": "#9af6b6",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#005047",
+                      "secondary-container": "#97f3b3",
+                      "secondary": "#006d3b",
+                      "on-surface-variant": "#3f4946",
+                      "on-background": "#191c1b",
+                      "background": "#f7faf8",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed": "#00201c",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#00210e",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed-dim": "#8ed3c7",
+                      "inverse-surface": "#2d3130",
+                      "error": "#ba1a1a",
+                      "outline-variant": "#bec9c5",
+                      "tertiary": "#612e1b",
+                      "on-tertiary-container": "#ffb69e",
+                      "secondary-fixed-dim": "#7ed99b",
+                      "surface-container-lowest": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#ffb59c",
+                      "surface-variant": "#e0e3e1",
+                      "surface-container-high": "#e6e9e7",
+                      "primary-fixed": "#aaf0e2",
+                      "primary-container": "#0e5e54",
+                      "inverse-primary": "#8ed3c7",
+                      "surface-container-low": "#f2f4f2",
+                      "on-tertiary-fixed-variant": "#6e3825",
+                      "surface-container-highest": "#e0e3e1",
+                      "surface-container": "#eceeec",
+                      "surface": "#f7faf8",
+                      "tertiary-container": "#7d4430",
+                      "surface-bright": "#f7faf8",
+                      "inverse-on-surface": "#eff1ef",
+                      "on-secondary-fixed-variant": "#00522b",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed": "#ffdbcf",
+                      "surface-tint": "#1f695f",
+                      "surface-dim": "#d8dbd9",
+                      "primary": "#00453d",
+                      "on-tertiary-fixed": "#370e02"
+              },
+              "borderRadius": {
+                      "DEFAULT": "10px",
+                      "lg": "10px",
+                      "xl": "12px",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "48px",
+                      "xs": "8px",
+                      "xl": "80px",
+                      "sm": "16px",
+                      "md": "24px",
+                      "margin": "32px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "h2": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "label-caps": ["Plus Jakarta Sans"],
+                      "h1": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "h3": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f7faf8; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .card-shadow { box-shadow: 0 10px 30px -5px rgba(14, 94, 84, 0.08); }
+        .row-hover:hover { background-color: #f2fdfa; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-white border-r border-slate-200 w-64 z-50">
+<div class="mb-6 px-4 py-2">
+<h2 class="text-primary-container font-h1 text-[20px] tracking-tight">HASES Ingeniería</h2>
+<p class="text-outline text-xs uppercase tracking-widest font-bold">Recursos Humanos</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<!-- Active State: Postulaciones belongs to "Personal" flow -->
+<a class="flex items-center gap-3 bg-teal-50 text-[#0e5e54] font-semibold px-4 py-3 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-body-md">Personal</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-body-md">Nómina</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-body-md">Contratos</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-body-md">Seguridad</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md">Reportes</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-slate-100">
+<button class="w-full bg-primary-container text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4 hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Nuevo Registro
+            </button>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-50 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md">Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="pl-64 flex flex-col min-h-screen">
+<!-- TopAppBar (Authority: JSON) -->
+<header class="flex justify-between items-center h-16 px-6 w-full bg-[#0e5e54] text-white border-b border-teal-700 shadow-sm sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-bold font-h2">Postulaciones</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:bg-teal-600 p-2 rounded-full transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-teal-600 p-2 rounded-full transition-colors" data-icon="settings">settings</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-teal-600 p-2 rounded-full transition-colors" data-icon="help">help</span>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-teal-600">
+<div class="text-right">
+<p class="text-xs font-bold leading-none">Admin Usuario</p>
+<p class="text-[10px] text-teal-200">Recursos Humanos</p>
+</div>
+<img alt="User avatar with initials" class="w-8 h-8 rounded-full border border-teal-400" data-alt="A professional headshot of a middle-aged male executive in a clean, modern office setting. He is wearing a crisp white shirt and a dark blazer. The lighting is bright and high-key, reflecting a corporate yet approachable atmosphere consistent with a high-end HR dashboard interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC-03EbkUh3kmukXz-S27u1sQz4S6vAm_JDGPNKotCWkGMKe0O4pFUtGHXLQnyvbAHOLiDeOF0Drwkiax1yRNprVM1one-ERZAborckTaiQgwUAo4BMxej_v37mtayGUYHwb7eE_mu6A1EuJOigmUfGA3-5QCg7XUDF0b2VwcAl4GDiVDabWoVjU0tBWx2lBdHRBUxmSF19lurOExXa2qHvx9adB42XMxTkINfwtkmZHJkTs3HBFxljdtSGIM58zV9LqNoXvCtdFw9"/>
+</div>
+</div>
+</header>
+<!-- Canvas Content -->
+<section class="p-8 max-w-[1280px] mx-auto w-full">
+<!-- Encabezado de Página -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-h1 text-primary-container text-h2 mb-1">Postulaciones</h2>
+<p class="text-outline font-body-md">Filtra por vacante o estado del pipeline</p>
+</div>
+<div class="bg-white border border-outline-variant px-6 py-3 rounded-lg card-shadow text-right">
+<p class="text-primary-container font-h3 text-h3 leading-none">128</p>
+<p class="text-label-caps text-outline uppercase mt-1">postulaciones · 24 esta semana</p>
+</div>
+</div>
+<!-- Barra de Filtros -->
+<div class="bg-white p-6 rounded-lg border border-outline-variant card-shadow mb-8 flex flex-wrap gap-4 items-end">
+<div class="flex-1 min-w-[240px]">
+<label class="block text-label-caps text-outline mb-2">BÚSQUEDA</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-on-secondary-container focus:border-on-secondary-container outline-none transition-all" placeholder="Buscar por nombre o email..." type="text"/>
+</div>
+</div>
+<div class="w-48">
+<label class="block text-label-caps text-outline mb-2">VACANTE</label>
+<select class="w-full px-4 py-2 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-on-secondary-container outline-none appearance-none">
+<option>Todas las vacantes</option>
+<option>Ingeniero Civil</option>
+<option>Mantenimiento Paisajístico</option>
+</select>
+</div>
+<div class="w-48">
+<label class="block text-label-caps text-outline mb-2">ESTADO</label>
+<select class="w-full px-4 py-2 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-on-secondary-container outline-none appearance-none">
+<option>Todos los estados</option>
+<option>Postulado</option>
+<option>Entrevista</option>
+</select>
+</div>
+<button class="bg-primary-container text-white px-8 py-2.5 rounded-lg font-bold hover:bg-primary active:scale-95 transition-all">
+                    Filtrar
+                </button>
+</div>
+<!-- Tabla de Datos -->
+<div class="bg-white rounded-xl border border-outline-variant card-shadow overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider">Postulante</th>
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider">Email</th>
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider">Estado</th>
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider">Canal</th>
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider">Fecha</th>
+<th class="px-6 py-4 text-label-caps text-outline font-bold border-b border-outline-variant uppercase tracking-wider text-right">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Fila 1 -->
+<tr class="row-hover transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
+                                        JD
+                                    </div>
+<span class="font-bold text-primary-container">Juan Delgado</span>
+</div>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-body-md">j.delgado@email.com</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700">Postulado</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">LinkedIn</td>
+<td class="px-6 py-4 text-on-surface-variant">12 Oct, 2023</td>
+<td class="px-6 py-4 text-right">
+<a class="text-primary-container font-bold hover:underline" href="#">Abrir</a>
+</td>
+</tr>
+<!-- Fila 2 -->
+<tr class="row-hover transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
+                                        MR
+                                    </div>
+<span class="font-bold text-primary-container">María Rojas</span>
+</div>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-body-md">m.rojas@servicios.co</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-primary-container">Documentos</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Referido</td>
+<td class="px-6 py-4 text-on-surface-variant">10 Oct, 2023</td>
+<td class="px-6 py-4 text-right">
+<a class="text-primary-container font-bold hover:underline" href="#">Abrir</a>
+</td>
+</tr>
+<!-- Fila 3 -->
+<tr class="row-hover transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
+                                        CA
+                                    </div>
+<span class="font-bold text-primary-container">Carlos Arango</span>
+</div>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-body-md">carango@hases.com</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container">Entrevista</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Web Oficial</td>
+<td class="px-6 py-4 text-on-surface-variant">08 Oct, 2023</td>
+<td class="px-6 py-4 text-right">
+<a class="text-primary-container font-bold hover:underline" href="#">Abrir</a>
+</td>
+</tr>
+<!-- Fila 4 -->
+<tr class="row-hover transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
+                                        EP
+                                    </div>
+<span class="font-bold text-primary-container">Elena Pérez</span>
+</div>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-body-md">eperez.dev@gmail.com</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-secondary text-white">Inducción</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Computrabajo</td>
+<td class="px-6 py-4 text-on-surface-variant">05 Oct, 2023</td>
+<td class="px-6 py-4 text-right">
+<a class="text-primary-container font-bold hover:underline" href="#">Abrir</a>
+</td>
+</tr>
+<!-- Fila 5 -->
+<tr class="row-hover transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
+                                        FG
+                                    </div>
+<span class="font-bold text-primary-container">Fernando Gómez</span>
+</div>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-body-md">fernando.g@outlook.com</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-secondary-fixed text-on-secondary-fixed">Onboarding completo</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Indeed</td>
+<td class="px-6 py-4 text-on-surface-variant">01 Oct, 2023</td>
+<td class="px-6 py-4 text-right">
+<a class="text-primary-container font-bold hover:underline" href="#">Abrir</a>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Paginación -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<p class="text-sm text-outline font-body-md">Mostrando 1 a 5 de 128 postulaciones</p>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-white text-outline disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined leading-none" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary-container text-white font-bold text-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white border border-transparent hover:border-outline-variant text-on-surface-variant text-sm font-medium transition-all">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white border border-transparent hover:border-outline-variant text-on-surface-variant text-sm font-medium transition-all">3</button>
+<span class="text-outline">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white border border-transparent hover:border-outline-variant text-on-surface-variant text-sm font-medium transition-all">26</button>
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-white text-outline">
+<span class="material-symbols-outlined leading-none" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bento Summary Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="bg-white p-6 rounded-lg border border-outline-variant card-shadow">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary-container p-2 bg-teal-50 rounded-lg" data-icon="person_add">person_add</span>
+<h4 class="font-h3 text-primary-container">Nuevos Hoy</h4>
+</div>
+<p class="text-h1 font-h1 text-on-surface leading-tight">08</p>
+<p class="text-sm text-on-secondary-container font-bold">+12% vs ayer</p>
+</div>
+<div class="bg-white p-6 rounded-lg border border-outline-variant card-shadow">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-secondary p-2 bg-green-50 rounded-lg" data-icon="timer">timer</span>
+<h4 class="font-h3 text-primary-container">Tiempo Promedio</h4>
+</div>
+<p class="text-h1 font-h1 text-on-surface leading-tight">12d</p>
+<p class="text-sm text-outline">Desde postulación a oferta</p>
+</div>
+<div class="bg-primary-container p-6 rounded-lg card-shadow text-white relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="font-h3 mb-2">Vacantes Activas</h4>
+<p class="text-h1 font-h1 leading-tight">14</p>
+<button class="mt-4 text-xs font-bold uppercase tracking-widest border border-teal-400 px-4 py-2 rounded hover:bg-teal-700 transition-colors">Ver Detalles</button>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 scale-150">
+<span class="material-symbols-outlined text-[120px]" data-icon="work">work</span>
+</div>
+</div>
+</div>
+</section>
+<footer class="mt-auto py-8 text-center border-t border-outline-variant">
+<p class="text-label-caps text-outline">HASES INGENIERÍA © 2023 · SISTEMA INTEGRAL DE GESTIÓN DE TALENTO</p>
+</footer>
+</main>
+</body></html>

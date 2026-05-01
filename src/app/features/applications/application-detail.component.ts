@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -12,6 +12,7 @@ import {
   InterviewSession,
   PIPELINE_STATUSES,
   RejectionReason,
+  statusBadgeClass,
   statusLabel,
 } from '../../core/types';
 import { AuthService } from '../../core/auth.service';
@@ -31,28 +32,101 @@ interface UploadDraft {
   issuedAt?: string;
 }
 
+interface PipelinePhase {
+  key: string;
+  label: string;
+  matches: string[];
+}
+
+const PIPELINE_PHASES: PipelinePhase[] = [
+  { key: 'apply', label: 'Postulación', matches: ['applied'] },
+  {
+    key: 'docs',
+    label: 'Documentos',
+    matches: ['docs_pending', 'docs_incomplete', 'docs_review', 'docs_approved'],
+  },
+  {
+    key: 'interview',
+    label: 'Entrevista',
+    matches: ['interview_pending', 'interview_done'],
+  },
+  {
+    key: 'occ',
+    label: 'Ocupacional',
+    matches: ['occ_pending', 'occ_sent', 'occ_result_received'],
+  },
+  { key: 'decision', label: 'Decisión', matches: ['hiring_pending', 'hired', 'rejected'] },
+  {
+    key: 'induction',
+    label: 'Inducción',
+    matches: [
+      'induction_org',
+      'induction_org_done',
+      'induction_theory',
+      'induction_epp_pending',
+      'induction_practice',
+    ],
+  },
+  { key: 'onboarding', label: 'Onboarding', matches: ['onboarding_complete'] },
+];
+
 @Component({
   selector: 'app-application-detail',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SignaturePadComponent],
   template: `
     <section class="page" *ngIf="app() as a; else loading">
-      <a routerLink="/applications" class="back-link">← Postulaciones</a>
-      <header class="page-head detail-head">
-        <div>
-          <h1>{{ a.first_name }} {{ a.last_name }}</h1>
-          <p class="page-subtitle">{{ a.email }} · {{ a.phone || '—' }}</p>
+      <a routerLink="/applications" class="back-link">
+        <span class="icon icon--sm">arrow_back</span> Postulaciones
+      </a>
+
+      <header class="detail-head">
+        <div class="detail-head__main">
+          <span class="avatar avatar--lg">{{ initials(a) }}</span>
+          <div>
+            <h1 class="detail-head__title">{{ a.first_name }} {{ a.last_name }}</h1>
+            <p class="detail-head__meta">
+              <span class="icon icon--sm">mail</span> {{ a.email }}
+              · <span class="icon icon--sm">call</span> {{ a.phone || '—' }}
+              <ng-container *ngIf="a.channel"> · canal {{ a.channel }}</ng-container>
+            </p>
+          </div>
         </div>
         <div class="detail-head__status">
-          <span class="badge badge--lg">{{ statusLabel(a.status) }}</span>
+          <span class="badge badge--lg" [class]="'badge badge--lg ' + badgeClass(a.status)">
+            {{ statusLabel(a.status) }}
+          </span>
           <small *ngIf="a.completeness as c">
             Documentos {{ c.required_satisfied }}/{{ c.required_total }} obligatorios
           </small>
         </div>
       </header>
 
+      <article class="card" style="padding: 8px 18px;">
+        <div class="pipeline-timeline">
+          <div
+            *ngFor="let phase of phases(); let i = index"
+            class="pipeline-timeline__step"
+            [class.is-done]="phase.state === 'done'"
+            [class.is-current]="phase.state === 'current'"
+          >
+            <div class="pipeline-timeline__node">
+              <span *ngIf="phase.state === 'done'" class="icon icon--sm">check</span>
+              <span *ngIf="phase.state !== 'done'">{{ i + 1 }}</span>
+            </div>
+            <div class="pipeline-timeline__name">{{ phase.label }}</div>
+          </div>
+        </div>
+      </article>
+
       <div class="tabs">
-        <button *ngFor="let t of tabs" [class.is-active]="active === t.id" (click)="active = t.id">
+        <button
+          *ngFor="let t of tabs"
+          [class.is-active]="active === t.id"
+          (click)="active = t.id"
+          type="button"
+        >
+          <span class="icon icon--sm">{{ t.icon }}</span>
           {{ t.label }}
         </button>
       </div>
@@ -74,9 +148,13 @@ interface UploadDraft {
           <textarea [(ngModel)]="edit.notes" name="notes" rows="4"></textarea>
         </label>
         <div class="form-actions form-grid__full">
-          <button class="btn btn--primary" (click)="saveData()">Guardar cambios</button>
           <button class="btn btn--ghost" (click)="invite(a.id)">
+            <span class="icon icon--sm">forward_to_inbox</span>
             {{ invitationToken ? 'Reenviar invitación' : 'Invitar al portal' }}
+          </button>
+          <button class="btn btn--primary" (click)="saveData()">
+            <span class="icon icon--sm">save</span>
+            Guardar cambios
           </button>
         </div>
         <p class="success form-grid__full" *ngIf="invitationToken">
@@ -92,12 +170,21 @@ interface UploadDraft {
             <option value="">Motivo…</option>
             <option *ngFor="let r of reasons()" [value]="r.label">{{ r.label }}</option>
           </select>
-          <button class="btn btn--primary" (click)="doTransition()">Aplicar</button>
+          <button class="btn btn--primary" (click)="doTransition()">
+            <span class="icon icon--sm">play_arrow</span>
+            Aplicar
+          </button>
         </fieldset>
       </section>
 
       <!-- Documentos -->
       <section *ngIf="active === 'documents'" class="card">
+        <div class="card-section-head">
+          <h2>Checklist documental</h2>
+          <span class="badge badge--soft" *ngIf="a.completeness as c">
+            {{ c.required_satisfied }}/{{ c.required_total }} obligatorios
+          </span>
+        </div>
         <table class="data-table data-table--docs">
           <thead>
             <tr><th>Documento</th><th>Estado</th><th>Archivo</th><th>Acciones</th></tr>
@@ -105,16 +192,26 @@ interface UploadDraft {
           <tbody>
             <tr *ngFor="let d of a.documents">
               <td>
-                {{ d.label }}
-                <span class="badge badge--soft" *ngIf="d.required">Obligatorio</span>
+                <strong>{{ d.label }}</strong>
+                <div class="row" style="gap:6px; margin-top:4px;">
+                  <span class="badge badge--neutral" *ngIf="d.required">Obligatorio</span>
+                  <span class="badge badge--soft" *ngIf="d.requires_template">Plantilla</span>
+                  <span class="badge badge--soft" *ngIf="d.requires_issued_at">Fecha emisión</span>
+                </div>
                 <p class="muted" *ngIf="d.max_age_days">
                   Máx. {{ d.max_age_days }} días de antigüedad
                 </p>
                 <p class="muted" *ngIf="d.issued_at">Emitido: {{ d.issued_at }}</p>
               </td>
-              <td><span class="badge">{{ d.review_status }}</span></td>
               <td>
-                <a *ngIf="d.file_id" [href]="api.fileUrl(d.file_id)" target="_blank">Descargar</a>
+                <span class="badge" [class]="'badge ' + docBadgeClass(d.review_status)">
+                  {{ docStatusLabel(d.review_status) }}
+                </span>
+              </td>
+              <td>
+                <a *ngIf="d.file_id" [href]="api.fileUrl(d.file_id)" target="_blank">
+                  <span class="icon icon--sm">download</span> Descargar
+                </a>
                 <span *ngIf="!d.file_id" class="muted">Sin archivo</span>
               </td>
               <td class="data-table__actions">
@@ -125,6 +222,7 @@ interface UploadDraft {
                   (change)="onDocFile(d, $event)"
                 />
                 <button class="btn btn--ghost" (click)="trigger('file-' + d.checklist_item_id)">
+                  <span class="icon icon--sm">attach_file</span>
                   Elegir
                 </button>
                 <input
@@ -138,12 +236,15 @@ interface UploadDraft {
                   [disabled]="!hasDraftFile(d.checklist_item_id)"
                   (click)="uploadDoc(a.id, d)"
                 >
+                  <span class="icon icon--sm">upload</span>
                   Subir
                 </button>
                 <button class="btn btn--ghost" *ngIf="d.file_id" (click)="review(a.id, d.id, 'approved')">
+                  <span class="icon icon--sm">check</span>
                   Aprobar
                 </button>
-                <button class="btn btn--ghost" *ngIf="d.file_id" (click)="review(a.id, d.id, 'rejected')">
+                <button class="btn btn--ghost btn--danger" *ngIf="d.file_id" (click)="review(a.id, d.id, 'rejected')">
+                  <span class="icon icon--sm">close</span>
                   Rechazar
                 </button>
               </td>
@@ -158,7 +259,10 @@ interface UploadDraft {
           <h2>Sesiones de entrevista</h2>
           <div class="card-section-head__actions">
             <input [(ngModel)]="newSession.template_id" placeholder="UUID plantilla" />
-            <button class="btn btn--primary" (click)="createSession(a.id)">Crear sesión</button>
+            <button class="btn btn--primary" (click)="createSession(a.id)">
+              <span class="icon icon--sm">add</span>
+              Crear sesión
+            </button>
           </div>
         </div>
         <table class="data-table" *ngIf="sessions().length; else noSessions">
@@ -197,7 +301,10 @@ interface UploadDraft {
                 />
               </td>
               <td>
-                <button class="btn btn--ghost" (click)="saveSession(s)">Guardar</button>
+                <button class="btn btn--ghost" (click)="saveSession(s)">
+                  <span class="icon icon--sm">save</span>
+                  Guardar
+                </button>
               </td>
             </tr>
           </tbody>
@@ -207,13 +314,18 @@ interface UploadDraft {
 
       <!-- Ocupacional / IPS -->
       <section *ngIf="active === 'occupational'" class="card form-grid">
-        <p>
-          <a [href]="api.occupationalPdfUrl(a.id)" target="_blank">Descargar PDF prellenado</a>.
+        <p class="form-grid__full">
+          <a [href]="api.occupationalPdfUrl(a.id)" target="_blank">
+            <span class="icon icon--sm">picture_as_pdf</span> Descargar PDF prellenado
+          </a>.
           Al "Enviar a IPS" se anexa este PDF al correo automáticamente.
         </p>
         <label>Email IPS<input [(ngModel)]="occ.email_to" name="occ_email" type="email" /></label>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="recordSend(a.id)">Enviar a IPS</button>
+          <button class="btn btn--primary" (click)="recordSend(a.id)">
+            <span class="icon icon--sm">send</span>
+            Enviar a IPS
+          </button>
         </div>
         <hr class="hr" />
         <h3 class="form-grid__full">Resultado IPS</h3>
@@ -231,16 +343,20 @@ interface UploadDraft {
         </label>
         <input type="file" id="ips-file" hidden (change)="onIPSFile($event)" />
         <button class="btn btn--ghost" (click)="trigger('ips-file')">
+          <span class="icon icon--sm">attach_file</span>
           {{ ips.file?.name || 'Adjuntar PDF de la IPS' }}
         </button>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="recordIPS(a.id)">Guardar resultado</button>
+          <button class="btn btn--primary" (click)="recordIPS(a.id)">
+            <span class="icon icon--sm">save</span>
+            Guardar resultado
+          </button>
         </div>
       </section>
 
       <!-- Decisión de empleador -->
       <section *ngIf="active === 'hiring'" class="card form-grid">
-        <h2 class="form-grid__full">Decisión final</h2>
+        <h2 class="form-grid__full" style="margin:0;">Decisión final</h2>
         <p class="page-subtitle form-grid__full">
           Disponible para roles <code>admin</code> y <code>hiring_manager</code>.
         </p>
@@ -257,9 +373,11 @@ interface UploadDraft {
         </label>
         <div class="form-actions">
           <button class="btn btn--primary" (click)="decide(a.id, 'hire')" [disabled]="hireDisabled()">
+            <span class="icon icon--sm">check_circle</span>
             Contratar
           </button>
-          <button class="btn btn--ghost" (click)="decide(a.id, 'reject')" [disabled]="hireDisabled()">
+          <button class="btn btn--danger" (click)="decide(a.id, 'reject')" [disabled]="hireDisabled()">
+            <span class="icon icon--sm">cancel</span>
             Rechazar
           </button>
         </div>
@@ -271,7 +389,7 @@ interface UploadDraft {
 
       <!-- Inducción -->
       <section *ngIf="active === 'induction'" class="card">
-        <h2>Módulos organizacionales</h2>
+        <div class="card-section-head"><h2>Módulos organizacionales</h2></div>
         <ul class="module-list">
           <li *ngFor="let m of modules()">
             <strong>{{ m.title }}</strong>
@@ -279,11 +397,16 @@ interface UploadDraft {
             <p class="muted" *ngIf="m.media?.length">
               {{ m.media!.length }} recurso(s) audiovisual(es) · auto-tracking en el portal
             </p>
-            <button class="btn btn--ghost" (click)="markProgress(a.id, m.id)">Marcar visto</button>
+            <button class="btn btn--ghost" (click)="markProgress(a.id, m.id)">
+              <span class="icon icon--sm">visibility</span>
+              Marcar visto
+            </button>
           </li>
         </ul>
 
-        <h3>Firmas (reglamento, políticas, contrato)</h3>
+        <div class="card-section-head" style="margin-top: 28px;">
+          <h2>Firmas</h2>
+        </div>
         <p class="page-subtitle">
           El trabajador puede firmar desde el portal con canvas. Aquí RR.HH. puede subir un archivo escaneado.
         </p>
@@ -291,7 +414,10 @@ interface UploadDraft {
           <div *ngFor="let kind of ['regulation','policies','contract']">
             <p class="signature-grid__label">{{ kind }}</p>
             <input type="file" [id]="'sig-' + kind" hidden (change)="uploadSignature(a.id, kind, $event)" />
-            <button class="btn btn--ghost" (click)="trigger('sig-' + kind)">Subir firma</button>
+            <button class="btn btn--ghost" (click)="trigger('sig-' + kind)">
+              <span class="icon icon--sm">upload</span>
+              Subir firma
+            </button>
           </div>
         </div>
 
@@ -307,6 +433,7 @@ interface UploadDraft {
         </details>
         <div class="form-actions">
           <button class="btn btn--primary" (click)="completeOrg(a.id)">
+            <span class="icon icon--sm">check_circle</span>
             Cerrar inducción organizacional
           </button>
         </div>
@@ -314,14 +441,20 @@ interface UploadDraft {
 
       <!-- Plan funcional / Dotación / EPP / Cronograma -->
       <section *ngIf="active === 'functional'" class="card form-grid">
-        <h2>Plan funcional</h2>
+        <h2 class="form-grid__full" style="margin:0;">Plan funcional</h2>
         <label class="form-grid__full">
           Resumen del manual
           <textarea [(ngModel)]="plan.manual_summary" name="plan_summary" rows="4"></textarea>
         </label>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="savePlan(a.id)">Guardar</button>
-          <button class="btn btn--ghost" (click)="closeTheory(a.id)">Marcar teoría completa</button>
+          <button class="btn btn--primary" (click)="savePlan(a.id)">
+            <span class="icon icon--sm">save</span>
+            Guardar
+          </button>
+          <button class="btn btn--ghost" (click)="closeTheory(a.id)">
+            <span class="icon icon--sm">menu_book</span>
+            Marcar teoría completa
+          </button>
         </div>
 
         <h3 class="form-grid__full">Cronograma</h3>
@@ -334,12 +467,13 @@ interface UploadDraft {
             <li *ngFor="let act of theoryActivities()">
               <strong>{{ act.sort_order }}. {{ act.title }}</strong>
               <p>{{ act.description }}</p>
-              <span class="badge" *ngIf="act.completed_at">Completado</span>
+              <span class="badge badge--success" *ngIf="act.completed_at">Completado</span>
               <button
                 class="btn btn--ghost"
                 *ngIf="!act.completed_at"
                 (click)="completeActivity(a.id, act)"
               >
+                <span class="icon icon--sm">task_alt</span>
                 Marcar completada
               </button>
             </li>
@@ -349,12 +483,13 @@ interface UploadDraft {
             <li *ngFor="let act of practiceActivities()">
               <strong>{{ act.sort_order }}. {{ act.title }}</strong>
               <p>{{ act.description }}</p>
-              <span class="badge" *ngIf="act.completed_at">Completada</span>
+              <span class="badge badge--success" *ngIf="act.completed_at">Completada</span>
               <button
                 class="btn btn--ghost"
                 *ngIf="!act.completed_at"
                 (click)="completeActivity(a.id, act)"
               >
+                <span class="icon icon--sm">task_alt</span>
                 Marcar completada
               </button>
             </li>
@@ -375,18 +510,27 @@ interface UploadDraft {
         </label>
         <input type="file" id="end-sig" hidden (change)="onEndowmentSignature($event)" />
         <button class="btn btn--ghost" (click)="trigger('end-sig')">
+          <span class="icon icon--sm">attach_file</span>
           {{ endowmentDraft.signature?.name || 'Adjuntar firma' }}
         </button>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="saveEndowment(a.id)">Registrar entrega</button>
-          <button class="btn btn--ghost" (click)="startPractice(a.id)">Iniciar práctica</button>
+          <button class="btn btn--primary" (click)="saveEndowment(a.id)">
+            <span class="icon icon--sm">save</span>
+            Registrar entrega
+          </button>
+          <button class="btn btn--ghost" (click)="startPractice(a.id)">
+            <span class="icon icon--sm">play_circle</span>
+            Iniciar práctica
+          </button>
         </div>
         <ul class="module-list" *ngIf="deliveries().length">
           <li *ngFor="let d of deliveries()">
-            <strong>{{ d.kind }}</strong>
+            <strong>{{ d.kind === 'epp' ? 'EPP' : 'Dotación' }}</strong>
             <p class="muted">Entregado {{ d.delivered_at }}</p>
             <p *ngIf="d.signature_file_id">
-              <a [href]="api.fileUrl(d.signature_file_id)" target="_blank">Ver firma</a>
+              <a [href]="api.fileUrl(d.signature_file_id)" target="_blank">
+                <span class="icon icon--sm">draw</span> Ver firma
+              </a>
             </p>
           </li>
         </ul>
@@ -412,14 +556,21 @@ interface UploadDraft {
         </label>
         <input type="file" id="ev-files" multiple hidden (change)="onEvidenceFiles($event)" />
         <button class="btn btn--ghost" (click)="trigger('ev-files')">
+          <span class="icon icon--sm">attach_file</span>
           {{ evidenceFiles.length ? evidenceFiles.length + ' archivo(s)' : 'Adjuntar archivos' }}
         </button>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="saveEvidence(a.id)">Registrar evidencia</button>
-          <button class="btn btn--ghost" (click)="completeFunctional(a.id)">Cerrar onboarding</button>
+          <button class="btn btn--primary" (click)="saveEvidence(a.id)">
+            <span class="icon icon--sm">save</span>
+            Registrar evidencia
+          </button>
+          <button class="btn btn--ghost" (click)="completeFunctional(a.id)">
+            <span class="icon icon--sm">verified</span>
+            Cerrar onboarding
+          </button>
         </div>
-        <p class="success" *ngIf="ok">{{ ok }}</p>
-        <p class="error" *ngIf="error">{{ error }}</p>
+        <p class="success form-grid__full" *ngIf="ok">{{ ok }}</p>
+        <p class="error form-grid__full" *ngIf="error">{{ error }}</p>
       </section>
     </section>
     <ng-template #loading><p class="page">Cargando…</p></ng-template>
@@ -434,6 +585,9 @@ interface UploadDraft {
         padding: 6px 10px;
         border-radius: var(--radius-sm);
         border: 1px solid var(--color-outline);
+      }
+      .data-table--docs td {
+        vertical-align: top;
       }
     `,
   ],
@@ -454,14 +608,14 @@ export class ApplicationDetailComponent implements OnInit {
   practiceActivities = () => this.activities().filter((a) => a.phase === 'practice');
 
   active: Tab = 'data';
-  tabs: { id: Tab; label: string }[] = [
-    { id: 'data', label: 'Datos' },
-    { id: 'documents', label: 'Documentos' },
-    { id: 'interviews', label: 'Entrevistas' },
-    { id: 'occupational', label: 'Ocupacional / IPS' },
-    { id: 'hiring', label: 'Decisión' },
-    { id: 'induction', label: 'Inducción' },
-    { id: 'functional', label: 'Funcional / EPP' },
+  tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: 'data', label: 'Datos', icon: 'badge' },
+    { id: 'documents', label: 'Documentos', icon: 'folder_shared' },
+    { id: 'interviews', label: 'Entrevistas', icon: 'forum' },
+    { id: 'occupational', label: 'Ocupacional / IPS', icon: 'medical_services' },
+    { id: 'hiring', label: 'Decisión', icon: 'how_to_vote' },
+    { id: 'induction', label: 'Inducción', icon: 'school' },
+    { id: 'functional', label: 'Funcional / EPP', icon: 'engineering' },
   ];
 
   edit = {
@@ -478,6 +632,7 @@ export class ApplicationDetailComponent implements OnInit {
   transitionReason = '';
   statuses = PIPELINE_STATUSES;
   statusLabel = statusLabel;
+  badgeClass = statusBadgeClass;
   invitationToken = '';
 
   newSession = { template_id: '' };
@@ -507,6 +662,45 @@ export class ApplicationDetailComponent implements OnInit {
 
   ok = '';
   error = '';
+
+  /**
+   * Construye la línea de tiempo del pipeline marcando fases completadas
+   * (anteriores al estado actual), la fase activa y las pendientes.
+   */
+  phases = computed(() => {
+    const current = this.app()?.status ?? '';
+    if (!current) return PIPELINE_PHASES.map((p) => ({ ...p, state: 'pending' as const }));
+    const idx = PIPELINE_PHASES.findIndex((p) => p.matches.includes(current));
+    return PIPELINE_PHASES.map((p, i) => ({
+      ...p,
+      state:
+        idx === -1
+          ? ('pending' as const)
+          : i < idx
+            ? ('done' as const)
+            : i === idx
+              ? ('current' as const)
+              : ('pending' as const),
+    }));
+  });
+
+  initials(a: ApplicationDetail): string {
+    const f = (a.first_name?.[0] ?? '').toUpperCase();
+    const l = (a.last_name?.[0] ?? '').toUpperCase();
+    return (f + l) || '?';
+  }
+
+  docStatusLabel(s: string): string {
+    return s === 'approved' ? 'Aprobado' : s === 'rejected' ? 'Rechazado' : 'Pendiente';
+  }
+
+  docBadgeClass(s: string): string {
+    return s === 'approved'
+      ? 'badge--success'
+      : s === 'rejected'
+        ? 'badge--error'
+        : 'badge--neutral';
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') ?? '';

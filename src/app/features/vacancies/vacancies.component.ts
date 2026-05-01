@@ -21,14 +21,18 @@ interface ActivityDraft {
       <header class="page-head page-head--with-action">
         <div>
           <h1>Vacantes</h1>
-          <p class="page-subtitle">Crea, publica, archiva y configura el manual y cronograma del cargo.</p>
+          <p class="page-subtitle">
+            Crea, publica, archiva y configura el manual y cronograma del cargo.
+          </p>
         </div>
         <button class="btn btn--primary" type="button" (click)="creating = !creating">
+          <span class="icon icon--sm">{{ creating ? 'close' : 'add' }}</span>
           {{ creating ? 'Cancelar' : 'Nueva vacante' }}
         </button>
       </header>
 
-      <form *ngIf="creating" class="card form-grid" (ngSubmit)="create()">
+      <form *ngIf="creating" class="card card--accent form-grid" (ngSubmit)="create()">
+        <h2 class="form-grid__full" style="margin:0;">Nueva vacante</h2>
         <label>
           Título
           <input name="title" [(ngModel)]="form.title" required />
@@ -42,43 +46,85 @@ interface ActivityDraft {
           <textarea name="requirements" [(ngModel)]="form.requirements" rows="3"></textarea>
         </label>
         <div class="form-actions form-grid__full">
-          <button class="btn btn--primary" type="submit">Crear</button>
+          <button class="btn btn--ghost" type="button" (click)="creating = false">Cancelar</button>
+          <button class="btn btn--primary" type="submit">
+            <span class="icon icon--sm">save</span>
+            Crear vacante
+          </button>
         </div>
-        <p class="error" *ngIf="error">{{ error }}</p>
+        <p class="error form-grid__full" *ngIf="error">{{ error }}</p>
       </form>
 
-      <table class="data-table" *ngIf="items().length; else empty">
-        <thead>
-          <tr><th>Título</th><th>Estado</th><th>Slug público</th><th>Acciones</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let v of items()">
-            <td>{{ v.title }}</td>
-            <td><span class="badge">{{ v.status }}</span></td>
-            <td><code>{{ v.public_slug }}</code></td>
-            <td class="data-table__actions">
-              <button class="btn btn--ghost" *ngIf="v.status === 'draft'" (click)="publish(v)">
-                Publicar
-              </button>
-              <button class="btn btn--ghost" *ngIf="v.status !== 'closed'" (click)="archive(v)">
-                Archivar
-              </button>
-              <button class="btn btn--ghost" (click)="select(v)">
-                {{ selectedId === v.id ? 'Cerrar' : 'Configurar' }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card" *ngIf="items().length; else empty">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vacante</th>
+              <th>Estado</th>
+              <th>Slug público</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of items()">
+              <td>
+                <div class="data-table__name">
+                  <span class="avatar avatar--sm avatar--accent">
+                    <span class="icon icon--sm">work</span>
+                  </span>
+                  <span>
+                    {{ v.title }}
+                    <small *ngIf="v.published_at">Publicada {{ v.published_at | slice : 0 : 10 }}</small>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class]="'badge ' + vacancyBadgeClass(v.status)">
+                  {{ vacancyStatusLabel(v.status) }}
+                </span>
+              </td>
+              <td>
+                <code class="text-muted">{{ v.public_slug || '—' }}</code>
+              </td>
+              <td class="data-table__actions" style="justify-content: flex-end;">
+                <button class="btn btn--ghost" *ngIf="v.status === 'draft'" (click)="publish(v)">
+                  <span class="icon icon--sm">rocket_launch</span>
+                  Publicar
+                </button>
+                <button class="btn btn--ghost" *ngIf="v.status !== 'closed'" (click)="archive(v)">
+                  <span class="icon icon--sm">archive</span>
+                  Archivar
+                </button>
+                <button
+                  class="btn"
+                  [class.btn--primary]="selectedId !== v.id"
+                  [class.btn--ghost]="selectedId === v.id"
+                  (click)="select(v)"
+                >
+                  <span class="icon icon--sm">{{ selectedId === v.id ? 'expand_less' : 'tune' }}</span>
+                  {{ selectedId === v.id ? 'Cerrar' : 'Configurar' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <ng-template #empty>
-        <p class="empty">No hay vacantes. Crea la primera con el botón superior.</p>
+        <p class="empty">
+          No hay vacantes registradas. Crea la primera con el botón superior.
+        </p>
       </ng-template>
 
-      <article class="card" *ngIf="selectedId">
-        <h2>Manual de funciones</h2>
-        <p class="page-subtitle">Texto enriquecido (markdown simple) y archivo opcional.</p>
+      <article class="card card--accent-soft" *ngIf="selectedId">
+        <div class="card-section-head">
+          <h2>Manual de funciones</h2>
+        </div>
+        <p class="page-subtitle" style="margin-bottom: 14px;">
+          Texto enriquecido (markdown simple) y archivo opcional con la versión definitiva.
+        </p>
         <textarea
           rows="6"
+          class="vac-textarea"
           [(ngModel)]="manual.body"
           name="manual_body"
           placeholder="Misión del cargo, responsabilidades, KPIs…"
@@ -86,35 +132,65 @@ interface ActivityDraft {
         <input type="file" id="man-file" hidden (change)="onManualFile($event)" />
         <div class="form-actions">
           <button class="btn btn--ghost" (click)="trigger('man-file')">
+            <span class="icon icon--sm">attach_file</span>
             {{ manualFile?.name || 'Adjuntar archivo (opcional)' }}
           </button>
-          <button class="btn btn--primary" (click)="saveManual()">Guardar manual</button>
-          <a *ngIf="manual.file_id" [href]="api.fileUrl(manual.file_id)" target="_blank">Ver archivo</a>
+          <button class="btn btn--primary" (click)="saveManual()">
+            <span class="icon icon--sm">save</span>
+            Guardar manual
+          </button>
+          <a *ngIf="manual.file_id" [href]="api.fileUrl(manual.file_id)" target="_blank">
+            Ver archivo actual
+          </a>
         </div>
 
-        <h2>Cronograma de actividades</h2>
-        <p class="page-subtitle">
+        <div class="card-section-head" style="margin-top: 32px;">
+          <h2>Cronograma de actividades</h2>
+        </div>
+        <p class="page-subtitle" style="margin-bottom: 14px;">
           Define las actividades de fase teórica y práctica que el trabajador debe completar.
         </p>
-        <table class="data-table">
+
+        <table class="data-table" *ngIf="templateActivities().length; else noActs">
           <thead>
-            <tr><th>Fase</th><th>Orden</th><th>Título</th><th>Descripción</th><th>Evidencia</th><th></th></tr>
+            <tr>
+              <th>Fase</th>
+              <th>Orden</th>
+              <th>Título</th>
+              <th>Descripción</th>
+              <th>Evidencia</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let a of templateActivities()">
-              <td><span class="badge">{{ a.phase }}</span></td>
-              <td>{{ a.sort_order }}</td>
-              <td>{{ a.title }}</td>
-              <td>{{ a.description }}</td>
-              <td>{{ a.evidence_required ? 'Sí' : 'No' }}</td>
               <td>
-                <button class="btn btn--ghost" (click)="deleteActivity(a)">Eliminar</button>
+                <span
+                  class="badge"
+                  [class.badge--soft]="a.phase === 'theory'"
+                  [class.badge--accent]="a.phase === 'practice'"
+                >
+                  {{ a.phase === 'theory' ? 'Teoría' : 'Práctica' }}
+                </span>
+              </td>
+              <td>{{ a.sort_order }}</td>
+              <td><strong>{{ a.title }}</strong></td>
+              <td class="text-muted">{{ a.description }}</td>
+              <td>{{ a.evidence_required ? 'Requerida' : 'Opcional' }}</td>
+              <td class="text-right">
+                <button class="btn btn--ghost btn--danger" (click)="deleteActivity(a)">
+                  <span class="icon icon--sm">delete</span>
+                  Eliminar
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <ng-template #noActs>
+          <p class="empty">Aún no hay actividades configuradas para este cargo.</p>
+        </ng-template>
 
-        <div class="form-grid">
+        <div class="form-grid" style="margin-top: 18px;">
           <label>
             Fase
             <select [(ngModel)]="newActivity.phase" name="na_phase">
@@ -139,7 +215,10 @@ interface ActivityDraft {
             Requiere evidencia
           </label>
           <div class="form-actions">
-            <button class="btn btn--primary" (click)="addActivity()">Agregar actividad</button>
+            <button class="btn btn--primary" (click)="addActivity()">
+              <span class="icon icon--sm">add</span>
+              Agregar actividad
+            </button>
           </div>
         </div>
         <p class="success" *ngIf="ok">{{ ok }}</p>
@@ -149,13 +228,25 @@ interface ActivityDraft {
   `,
   styles: [
     `
-      textarea {
+      .vac-textarea {
         width: 100%;
-        padding: 9px 12px;
+        padding: 12px 14px;
         border-radius: var(--radius-sm);
         border: 1px solid var(--color-outline);
         font-family: inherit;
+        font-size: 0.9375rem;
         background: var(--color-surface-elevated);
+        color: var(--color-on-surface);
+        line-height: 1.5;
+        resize: vertical;
+        min-height: 120px;
+        transition: border-color var(--motion-fast) var(--easing-standard),
+          box-shadow var(--motion-fast) var(--easing-standard);
+      }
+      .vac-textarea:focus {
+        outline: none;
+        border-color: var(--color-focus-ring);
+        box-shadow: var(--shadow-focus);
       }
     `,
   ],
@@ -188,6 +279,18 @@ export class VacanciesComponent implements OnInit {
 
   refresh(): void {
     this.api.listVacancies().subscribe({ next: (v) => this.items.set(v ?? []) });
+  }
+
+  vacancyStatusLabel(s: Vacancy['status']): string {
+    return s === 'draft' ? 'Borrador' : s === 'published' ? 'Publicada' : 'Cerrada';
+  }
+
+  vacancyBadgeClass(s: Vacancy['status']): string {
+    return s === 'published'
+      ? 'badge--status-induction'
+      : s === 'closed'
+        ? 'badge--neutral'
+        : 'badge--status-applied';
   }
 
   create(): void {

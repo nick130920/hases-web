@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#1f695f",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#8ed3c7",
+                        "on-primary-fixed": "#00201c",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#bec9c6",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed": "#00210c",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-fixed-variant": "#005227",
+                        "on-surface": "#0b1c30",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-container": "#6dfe9c",
+                        "background": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-tertiary-fixed-variant": "#3f4947",
+                        "outline-variant": "#bec9c5",
+                        "inverse-primary": "#8ed3c7",
+                        "on-tertiary-fixed": "#141d1c",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary": "#00453d",
+                        "tertiary": "#353f3d",
+                        "tertiary-fixed": "#dae5e2",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-container": "#007439",
+                        "on-primary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "secondary": "#006d36",
+                        "primary-container": "#0e5e54",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#005047",
+                        "tertiary-container": "#4b5654",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#c0cac8",
+                        "secondary-fixed": "#6dfe9c",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "secondary-fixed-dim": "#4de082",
+                        "on-surface-variant": "#3f4946",
+                        "on-primary-container": "#8fd5c8",
+                        "primary-fixed": "#aaf0e2",
+                        "outline": "#6f7976",
+                        "surface-container-low": "#eff4ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "sidebar_width": "220px",
+                        "stack_lg": "24px",
+                        "container_padding": "32px",
+                        "topbar_height": "64px"
+                    },
+                    "fontFamily": {
+                        "h1": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "h3": ["Plus Jakarta Sans"],
+                        "h2": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "button": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "button": ["14px", {"lineHeight": "20px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8f9ff; }
+        .teal-shadow { box-shadow: 0 4px 12px rgba(14, 94, 84, 0.08); }
+        .sidebar-active { background-color: #eef9f6; color: #0e5e54; border-left: 4px solid #0e5e54; font-weight: 600; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="flex min-h-screen text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-[220px] bg-white border-r border-slate-200 z-40 flex flex-col py-6">
+<div class="px-6 mb-10">
+<div class="flex flex-col">
+<span class="text-primary-container font-black text-lg uppercase tracking-wider">HASES</span>
+<span class="text-slate-400 font-semibold text-[10px] uppercase tracking-[0.2em] -mt-1">Ingeniería</span>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 sidebar-active space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm">Tablero</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-teal-50 hover:text-primary-container transition-all duration-200 space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">group_add</span>
+<span class="text-sm">Postulaciones</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-teal-50 hover:text-primary-container transition-all duration-200 space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">badge</span>
+<span class="text-sm">Personal</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-teal-50 hover:text-primary-container transition-all duration-200 space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">folder_shared</span>
+<span class="text-sm">Documentos</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-teal-50 hover:text-primary-container transition-all duration-200 space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">engineering</span>
+<span class="text-sm">Proyectos</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-teal-50 hover:text-primary-container transition-all duration-200 space-x-3" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm">Ajustes</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<a class="flex items-center py-3 text-slate-500 hover:text-primary-container transition-colors space-x-3 border-t border-slate-100" href="#">
+<span class="material-symbols-outlined text-xl">help</span>
+<span class="text-sm">Ayuda</span>
+</a>
+</div>
+</aside>
+<!-- Main Wrapper -->
+<div class="flex-1 ml-[220px] flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 h-16 bg-primary-container text-white flex items-center justify-between px-8 teal-shadow">
+<div class="flex items-center space-x-4">
+<div class="text-xl font-bold tracking-tight">HASES Ingeniería</div>
+<div class="h-4 w-px bg-white/20"></div>
+<div class="text-teal-100/70 text-xs font-medium uppercase tracking-widest">Gestión de Talento</div>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative group">
+<span class="material-symbols-outlined text-teal-100 hover:text-white cursor-pointer">search</span>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-teal-100 hover:text-white cursor-pointer relative">
+                        notifications
+                        <span class="absolute -top-1 -right-1 block w-2 h-2 bg-secondary rounded-full"></span>
+</span>
+<span class="material-symbols-outlined text-teal-100 hover:text-white cursor-pointer">settings</span>
+<div class="h-8 w-8 rounded-full bg-teal-700 flex items-center justify-center overflow-hidden border border-white/20">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A professional corporate headshot of a smiling recruitment manager in a bright office environment. The image is captured with soft-focus background highlights, showcasing a clean, modern aesthetic with teal and white brand colors visible in the office decor. The lighting is bright and natural, reflecting a high-energy HR professional environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlS8VM1Wv6KJmY-U3v1G4-nFPvrgNLS-2uaNG69eN85z8VmSG2M6zVF7FYUb8sSS-UcauwilP9GJ0yBsePMtYuTdHxdAi3_q7nqKtzlCrIBeN2XIuMIAJosQ5q8k_wJwkXRBUCS69mPJqk3TTQwkIxy6ODWieoFm0il4QPgsYdnGZrc5QJ_nyGYZuxZ4loXBtrz7jN7TbqgDHj2b9OH1WOiocJUjrOqBYwXS6In72OtdumxmEaw4iWz1oXjs1xuzlKF3_NQss9XuTt"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<main class="p-8 space-y-8">
+<!-- Header Section -->
+<div class="space-y-1">
+<h1 class="font-h1 text-h1 text-primary-container">Tablero</h1>
+<p class="font-body-sm text-body-sm text-slate-500">Resumen general de gestión humana y proyectos activos.</p>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-white p-6 rounded-xl teal-shadow border-l-4 border-primary-container flex justify-between items-start">
+<div>
+<span class="font-label-caps text-label-caps text-slate-400 uppercase">Personal Activo</span>
+<div class="text-h1 font-h1 text-primary-container mt-2">1,248</div>
+</div>
+<span class="material-symbols-outlined text-primary-container/30 text-2xl">skull</span>
+</div>
+<!-- KPI 2 -->
+<div class="bg-white p-6 rounded-xl teal-shadow border-l-4 border-primary-container flex justify-between items-start">
+<div>
+<span class="font-label-caps text-label-caps text-slate-400 uppercase">Nuevas Bajas</span>
+<div class="text-h1 font-h1 text-primary-container mt-2">12</div>
+</div>
+<span class="material-symbols-outlined text-primary-container/30 text-2xl">cut</span>
+</div>
+<!-- KPI 3 -->
+<div class="bg-white p-6 rounded-xl teal-shadow border-l-4 border-secondary flex justify-between items-start">
+<div>
+<span class="font-label-caps text-label-caps text-slate-400 uppercase">Entrevistas Hoy</span>
+<div class="text-h1 font-h1 text-primary-container mt-2">08</div>
+</div>
+<span class="material-symbols-outlined text-secondary/30 text-2xl">water_drop</span>
+</div>
+<!-- KPI 4 -->
+<div class="bg-white p-6 rounded-xl teal-shadow border-l-4 border-secondary flex justify-between items-start">
+<div>
+<span class="font-label-caps text-label-caps text-slate-400 uppercase">Capacitaciones</span>
+<div class="text-h1 font-h1 text-primary-container mt-2">45</div>
+</div>
+<span class="material-symbols-outlined text-secondary/30 text-2xl">brush</span>
+</div>
+</div>
+<!-- Dashboard Body -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Section: Postulaciones Table -->
+<div class="lg:col-span-2 bg-white rounded-xl teal-shadow overflow-hidden border-l-4 border-primary-container">
+<div class="p-6 border-b border-slate-100 flex justify-between items-center">
+<h3 class="font-h3 text-h3 text-primary-container">Últimas postulaciones</h3>
+<button class="text-sm font-semibold text-primary-container hover:underline">Ver todo</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-[#eef9f6] text-primary-container font-semibold">
+<tr>
+<th class="px-6 py-4 text-sm uppercase tracking-wider">Candidato</th>
+<th class="px-6 py-4 text-sm uppercase tracking-wider">Puesto</th>
+<th class="px-6 py-4 text-sm uppercase tracking-wider">Estado</th>
+<th class="px-6 py-4 text-sm uppercase tracking-wider">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex-shrink-0">
+<img alt="Avatar" class="rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_t7gloqlcgDoPFDbVqgWDai7O0ZhXu6i5emY-BUxvVpl6wuPtCU1e6s1bZEiKwLgVJ2_z-H1_V1z6CAw0skBHgE3FxFAaWA1hvutht1eycS5Mfad6jP6g6aMZCfYSNLlC26j6g5A8wBzL4VhDfDCqRmrf43dSD766ngvHE9iJOGsVn1naybyD6wTwRTfhavMoQ6fSXXSZNxsnkwQ2IIn1M1R3ELkrd_vbOabpvaUTHoYHyjRulzDvMUMrV6H3CcCV1-fK4HDYpicA"/>
+</div>
+<div class="font-medium text-on-surface">Ricardo Paredes</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 text-sm">Ingeniero Civil Jr.</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-teal-100 text-primary-container rounded-full text-xs font-bold uppercase tracking-tight">Entrevista</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary-container font-semibold text-sm hover:text-primary transition-colors" href="#">Abrir</a>
+</td>
+</tr>
+<tr class="bg-slate-50/30 hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex-shrink-0">
+<img alt="Avatar" class="rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjt3fQVZRYWCXdD6kjndvSlxlm0eJHIuo4nAOTCu4KPdYal21NI4_5K69P0JrKkE57yKh42VevtCf8ibTzg4k6UvB86g-KkvcwzMBKAJCa5U-xA_LfFgdpbs0T4eNWFhkiqK0O2YDAe_VgmQ-z9JKGg9Y5MgSZp-QNbtB0EvRyYftFpLNK1YACbdDHUHAJ1Mj1mxa4b3htZRHFIewjQyEo0_6fPfsaX42_QnU91NmsQoVQ3DQqLS6L0W53uwGHDyT5XDzLr8667RNc"/>
+</div>
+<div class="font-medium text-on-surface">Ana Lía López</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 text-sm">Analista de Seguridad</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold uppercase tracking-tight">Postulado</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary-container font-semibold text-sm hover:text-primary transition-colors" href="#">Abrir</a>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex-shrink-0">
+<img alt="Avatar" class="rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm0JKa1SdetEZF-MJuILiyCsZSGhUsnzN_3FdqD8-AYUdJxk9Xi9BlKJb7fymN56WoeTE2i2yJXDkS_KBORYDy2Mzzssu_h1o-Dk3fx5L4UWh79e7_AmcrwMM4s1Rlfta-HzIutUc0pEZMnsci4YiAzL48D1kPE3fcFOcoK5KNrCa9WZgMuJW872kxx8csFV1ZvtRl7LX7O39U9WZUHPOl_541aADdEBvOGzid3iCyl-rR3G7yqpUZ1kk4EJT5SROO_i5UTe1eRmo1"/>
+</div>
+<div class="font-medium text-on-surface">Marcos Segura</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 text-sm">Topógrafo Senior</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold uppercase tracking-tight">En Revisión</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary-container font-semibold text-sm hover:text-primary transition-colors" href="#">Abrir</a>
+</td>
+</tr>
+<tr class="bg-slate-50/30 hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex-shrink-0">
+<img alt="Avatar" class="rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBha23F1Wp57wl8Ysomf_CjtcZ4_SnzcZsLQVyzUGS6nfLS3Q4khfCPvMZBytx6S3k5-kGTFP_4n-xgOkn3K8RZBk97wB3fy5YeUsdjABXaBukXqIDFEi3jgocBk2dgZthvqIC0H1RPtrzgA6jKPeLlIOMGDxpXRYg4dzzPHClzeDBYckPn45cnx4ii4YnP7R64yehulk5w2kczSGWfXQjRXuIjRDitBXnR5lbMCrV8bmtQxBPBFyM7n2Gg64bdXcNTagPhSBtSg9Om"/>
+</div>
+<div class="font-medium text-on-surface">Carla Martínez</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 text-sm">Auxiliar Administrativo</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-teal-100 text-primary-container rounded-full text-xs font-bold uppercase tracking-tight">Inducción</span>
+</td>
+<td class="px-6 py-4">
+<a class="text-primary-container font-semibold text-sm hover:text-primary transition-colors" href="#">Abrir</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Section: Pipeline en vivo -->
+<div class="bg-white rounded-xl teal-shadow border-l-4 border-primary-container flex flex-col">
+<div class="p-6 border-b border-slate-100">
+<h3 class="font-h3 text-h3 text-primary-container">Pipeline en vivo</h3>
+</div>
+<div class="p-6 flex-1 space-y-6">
+<!-- Pipeline Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-secondary bg-white flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+</div>
+<div class="absolute left-1.5 top-5 w-0.5 h-full bg-slate-100"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-semibold text-primary-container">Postulado</span>
+<span class="text-xs font-bold text-slate-400">84%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[84%]"></div>
+</div>
+</div>
+</div>
+<!-- Pipeline Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-secondary bg-white flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+</div>
+<div class="absolute left-1.5 top-5 w-0.5 h-full bg-slate-100"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-semibold text-primary-container">Documentos</span>
+<span class="text-xs font-bold text-slate-400">62%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[62%]"></div>
+</div>
+</div>
+</div>
+<!-- Pipeline Item (Active Halo) -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-primary bg-primary-fixed ring-4 ring-primary-fixed/30 flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+</div>
+<div class="absolute left-1.5 top-5 w-0.5 h-full bg-slate-100"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-bold text-primary">Entrevista</span>
+<span class="text-xs font-bold text-primary">45%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[45%]"></div>
+</div>
+</div>
+</div>
+<!-- Pipeline Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-slate-300 bg-white"></div>
+<div class="absolute left-1.5 top-5 w-0.5 h-full bg-slate-100"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-semibold text-slate-500">Inducción</span>
+<span class="text-xs font-bold text-slate-400">28%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[28%]"></div>
+</div>
+</div>
+</div>
+<!-- Pipeline Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-slate-300 bg-white"></div>
+<div class="absolute left-1.5 top-5 w-0.5 h-full bg-slate-100"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-semibold text-slate-500">Práctica</span>
+<span class="text-xs font-bold text-slate-400">15%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[15%]"></div>
+</div>
+</div>
+</div>
+<!-- Pipeline Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-slate-300 bg-white"></div>
+<div class="flex flex-col space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm font-semibold text-slate-500">Onboarding</span>
+<span class="text-xs font-bold text-slate-400">05%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[5%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
