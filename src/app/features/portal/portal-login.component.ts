@@ -3,20 +3,22 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { ThemeToggleComponent } from '../../shared/theme-toggle.component';
 
 @Component({
   selector: 'app-portal-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ThemeToggleComponent],
   template: `
     <div class="auth-page">
       <header class="brand-header">
         <div class="brand-header__inner">
           <div class="brand-header__logo" aria-hidden="true">H</div>
-          <div>
+          <div style="flex:1; min-width:0;">
             <p class="brand-header__name">Portal del trabajador · HASES</p>
             <p class="brand-header__tagline">Continúa tu proceso de ingreso</p>
           </div>
+          <app-theme-toggle />
         </div>
       </header>
 

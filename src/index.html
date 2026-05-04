@@ -6,9 +6,28 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Sistema interno de gestión del ciclo de vida laboral — HASES Ingeniería S.A.S.">
+  <meta name="theme-color" content="#0e5e54" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#04110f" media="(prefers-color-scheme: dark)">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+    // Aplica el tema antes de que el bundle de Angular evalue, para evitar
+    // un parpadeo (FOUC) entre claro y oscuro al recargar la pagina.
+    (function () {
+      try {
+        var stored = localStorage.getItem('hases.theme');
+        var prefersDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored === 'dark' || stored === 'light'
+          ? stored
+          : (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

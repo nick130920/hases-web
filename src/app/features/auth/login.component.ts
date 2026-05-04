@@ -3,22 +3,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { ThemeToggleComponent } from '../../shared/theme-toggle.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ThemeToggleComponent],
   template: `
     <div class="auth-page">
       <header class="brand-header">
         <div class="brand-header__inner">
           <div class="brand-header__logo" aria-hidden="true">H</div>
-          <div>
+          <div style="flex:1; min-width:0;">
             <p class="brand-header__name">HASES Ingeniería</p>
             <p class="brand-header__tagline">
               Aseo · Jardinería · Piscinas · Apoyo operativo · Sostenibilidad
             </p>
           </div>
+          <app-theme-toggle />
         </div>
       </header>
 

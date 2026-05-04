@@ -80,6 +80,95 @@
   --motion-fast: 140ms;
   --motion-normal: 220ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Backgrounds del body para cada esquema (sirve a quien quiera reusarlos). */
+  --body-bg-radial-a: rgba(45, 138, 84, 0.06);
+  --body-bg-radial-b: rgba(14, 94, 84, 0.05);
+
+  /* Topbar gradient ends, por tema, para mantener un look consistente. */
+  --topbar-grad-start: #0e5e54;
+  --topbar-grad-end: #0a4a42;
+
+  /* Sidebar / panel translucido, por tema. */
+  --sidebar-glass-a: rgba(255, 255, 255, 0.96);
+  --sidebar-glass-b: rgba(244, 250, 247, 0.96);
+  --sidebar-fade: rgba(244, 250, 247, 0.95);
+
+  /* Tabla — tinte de hover (gradiente lateral). */
+  --table-row-hover-a: rgba(232, 245, 236, 0.55);
+  --table-row-hover-b: rgba(232, 245, 236, 0.18);
+}
+
+/* ===== Tokens — Dark theme ===============================================
+   Se activa cuando html[data-theme='dark']. Mantenemos los mismos nombres
+   de variable que el tema claro: cualquier componente existente "se ajusta"
+   sin tocar selectores. Los acentos teal/verde se conservan, pero los
+   neutros se invierten a un teal-noche para preservar la identidad. */
+:root[data-theme='dark'] {
+  --color-primary: #4cbfaa;
+  --color-primary-deep: #6dd9c2;
+  --color-primary-hover: #62cdb6;
+  --color-primary-muted: #1d3a36;
+  --color-on-primary: #062420;
+
+  --color-accent: #5fc886;
+  --color-accent-strong: #97f3b3;
+  --color-accent-soft: #15302a;
+  --color-accent-fixed: #1f4a36;
+
+  --color-surface: #0a1614;
+  --color-surface-mint: #112621;
+  --color-surface-elevated: #122220;
+  --color-surface-low: #0d1c1a;
+  --color-surface-header: #061513;
+
+  --color-on-surface: #e2efeb;
+  --color-on-surface-strong: #f3faf7;
+  --color-on-surface-secondary: #a8bcb6;
+  --color-on-surface-muted: #7d918b;
+  --color-on-surface-header: #f1faf7;
+
+  --color-outline: #1f3531;
+  --color-outline-strong: #2a4540;
+
+  --color-link: #6dd9c2;
+  --color-link-hover: #97f3b3;
+  --color-focus-ring: #5fc886;
+
+  --color-error: #ff8a82;
+  --color-error-strong: #ffb3ac;
+  --color-error-container: #4d1812;
+
+  --color-success: #6dd9a0;
+  --color-warning: #ffc372;
+  --color-warning-container: #3d2706;
+  --color-info: #7fb6e8;
+  --color-info-container: #0c2a44;
+
+  --color-disabled-text: #5d706c;
+
+  /* Sombras mas profundas (negro puro) en oscuro: las sombras tintadas
+     dejan de funcionar bien sobre fondos oscuros. */
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.55);
+  --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-focus: 0 0 0 3px rgba(95, 200, 134, 0.35);
+
+  --body-bg-radial-a: rgba(95, 200, 134, 0.10);
+  --body-bg-radial-b: rgba(76, 191, 170, 0.08);
+
+  --topbar-grad-start: #0a1c1a;
+  --topbar-grad-end: #04110f;
+
+  --sidebar-glass-a: rgba(13, 28, 26, 0.92);
+  --sidebar-glass-b: rgba(10, 22, 20, 0.92);
+  --sidebar-fade: rgba(10, 22, 20, 0.95);
+
+  --table-row-hover-a: rgba(95, 200, 134, 0.10);
+  --table-row-hover-b: rgba(95, 200, 134, 0.04);
+
+  color-scheme: dark;
 }
 
 /* ===== Reset / Base ====================================================== */
@@ -97,6 +186,10 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -107,10 +200,12 @@ body {
   /* Fondo levemente degradado para evitar la sensacion de "panel plano".
      Dos gradientes radiales muy sutiles dan profundidad sin ruido. */
   background:
-    radial-gradient(1200px 600px at 0% -10%, rgba(45, 138, 84, 0.06), transparent 60%),
-    radial-gradient(1000px 500px at 100% -5%, rgba(14, 94, 84, 0.05), transparent 55%),
+    radial-gradient(1200px 600px at 0% -10%, var(--body-bg-radial-a), transparent 60%),
+    radial-gradient(1000px 500px at 100% -5%, var(--body-bg-radial-b), transparent 55%),
     var(--color-surface);
   background-attachment: fixed;
+  transition: background-color var(--motion-normal) var(--easing-standard),
+    color var(--motion-normal) var(--easing-standard);
 }
 
 /* Seleccion en color de marca para reforzar la identidad. */
@@ -281,9 +376,9 @@ button {
    ========================================================================== */
 .shell-topbar {
   height: var(--shell-topbar-height);
-  /* Gradiente teal->teal profundo para dar volumen sutil a la barra. */
-  background:
-    linear-gradient(180deg, #0e5e54 0%, #0a4a42 100%);
+  /* Gradiente teal->teal profundo para dar volumen sutil a la barra.
+     Vars cambian con el tema (claro y oscuro tienen valores propios). */
+  background: linear-gradient(180deg, var(--topbar-grad-start) 0%, var(--topbar-grad-end) 100%);
   color: var(--color-on-surface-header);
   position: sticky;
   top: 0;
@@ -470,8 +565,8 @@ button {
      se note bajo el panel sin restarle legibilidad. */
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(244, 250, 247, 0.96) 100%
+    var(--sidebar-glass-a) 0%,
+    var(--sidebar-glass-b) 100%
   );
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -1135,8 +1230,8 @@ a.kpi-card:hover .kpi-card__icon {
 .data-table tbody tr:hover {
   background: linear-gradient(
     90deg,
-    rgba(232, 245, 236, 0.55) 0%,
-    rgba(232, 245, 236, 0.18) 100%
+    var(--table-row-hover-a) 0%,
+    var(--table-row-hover-b) 100%
   );
   box-shadow: inset 3px 0 0 var(--color-accent);
 }
@@ -2449,7 +2544,7 @@ a.kpi-card:hover .kpi-card__icon {
   height: 24px;
   margin: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, rgba(244, 250, 247, 0.95) 100%);
+  background: linear-gradient(180deg, transparent 0%, var(--sidebar-fade) 100%);
 }
 
 /* Pequeno detalle: tabs con underline animado. */
@@ -2504,6 +2599,259 @@ a.kpi-card:hover .kpi-card__icon {
 /* Topbar: kicker entre brand y contenido. */
 .shell-topbar__section {
   position: relative;
+}
+
+/* ==========================================================================
+   Theme toggle switch
+   ==========================================================================
+   Switch reutilizable que se anima entre sol y luna. Pensado para vivir
+   junto a otros controles dentro de la topbar (oscuro->claro y viceversa)
+   y tambien funcionar como pieza independiente en el header del portal o
+   la pantalla de login. */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 56px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--easing-standard),
+    border-color var(--motion-fast) var(--easing-standard);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent-fixed);
+  outline-offset: 2px;
+}
+
+/* Knob */
+.theme-toggle__knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe9a8 0%, #ffd166 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  transform: translateY(-50%);
+  transition:
+    left var(--motion-normal) var(--easing-standard),
+    background var(--motion-normal) var(--easing-standard);
+}
+
+.theme-toggle[aria-pressed='true'] .theme-toggle__knob {
+  left: calc(100% - 25px);
+  background: linear-gradient(135deg, #cfe9ff 0%, #97baff 100%);
+}
+
+/* Iconos de fondo: se intercambian segun el estado del switch. */
+.theme-toggle__icons {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7px;
+  pointer-events: none;
+}
+
+.theme-toggle__icons .icon {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  transition: opacity var(--motion-fast) var(--easing-standard);
+}
+
+.theme-toggle[aria-pressed='false'] .theme-toggle__icons .icon:nth-child(1) {
+  opacity: 0;
+}
+.theme-toggle[aria-pressed='true'] .theme-toggle__icons .icon:nth-child(2) {
+  opacity: 0;
+}
+
+/* Variante para fondos claros (cuando se reusa fuera de la topbar). */
+.theme-toggle--inverse {
+  background: var(--color-surface-low);
+  border-color: var(--color-outline);
+}
+
+.theme-toggle--inverse:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.theme-toggle--inverse .theme-toggle__icons .icon {
+  color: var(--color-on-surface-secondary);
+}
+
+/* ==========================================================================
+   Dark theme — overrides puntuales
+   ==========================================================================
+   La mayoria de selectores ya consumen variables y por tanto se adaptan
+   solas. Aqui solo cubrimos los puntos donde habia color hardcoded o
+   donde el contraste necesita un ajuste especifico para el modo oscuro. */
+:root[data-theme='dark'] {
+  /* Status badges del pipeline: en claro usaban tonalidades pastel; en
+     oscuro las invertimos a fondos translucidos para conservar la lectura. */
+}
+
+[data-theme='dark'] .badge--status-applied {
+  background: rgba(255, 255, 255, 0.06);
+  color: #cdd9d6;
+}
+[data-theme='dark'] .badge--status-docs {
+  background: rgba(95, 200, 134, 0.14);
+  color: #97f3b3;
+}
+[data-theme='dark'] .badge--status-interview {
+  background: rgba(151, 243, 179, 0.16);
+  color: #b9f6cb;
+}
+[data-theme='dark'] .badge--status-decision {
+  background: rgba(255, 195, 114, 0.14);
+  color: #ffc372;
+}
+[data-theme='dark'] .badge--status-induction {
+  background: rgba(95, 200, 134, 0.22);
+  color: #d8ffe6;
+}
+[data-theme='dark'] .badge--status-onboarding {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: #062420;
+}
+[data-theme='dark'] .badge--status-rejected {
+  background: rgba(255, 138, 130, 0.16);
+  color: #ffb3ac;
+}
+
+/* Texto del avatar: en dark, los gradientes son colores claros, asi que
+   el texto blanco no contrasta. Lo cambiamos a un teal-noche legible. */
+[data-theme='dark'] .avatar,
+[data-theme='dark'] .shell-topbar__avatar,
+[data-theme='dark'] .brand-header__logo,
+[data-theme='dark'] .shell-topbar__logo {
+  color: #062420;
+}
+
+[data-theme='dark'] .shell-topbar__user-role {
+  background: rgba(151, 243, 179, 0.12);
+  color: var(--color-accent-strong);
+}
+
+[data-theme='dark'] .shell-topbar__avatar {
+  border-color: rgba(151, 243, 179, 0.28);
+}
+
+[data-theme='dark'] .shell-topbar__logout {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme='dark'] .shell-topbar__logout:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(151, 243, 179, 0.40);
+}
+
+/* La linea inferior decorativa de la topbar pierde contraste en oscuro;
+   la subimos un poco. */
+[data-theme='dark'] .shell-topbar::after {
+  opacity: 0.85;
+}
+
+/* KPI card icon en dark: los gradientes claros perdian peso. */
+[data-theme='dark'] .kpi-card__icon {
+  background: linear-gradient(135deg, rgba(95, 200, 134, 0.18) 0%, rgba(76, 191, 170, 0.22) 100%);
+  color: var(--color-primary-deep);
+  box-shadow: inset 0 0 0 1px rgba(95, 200, 134, 0.14);
+}
+
+[data-theme='dark'] .kpi-card::after {
+  background: radial-gradient(circle at top right, rgba(95, 200, 134, 0.16), transparent 65%);
+}
+
+/* Empty states: el wash claro no contrasta sobre fondo oscuro. */
+[data-theme='dark'] .empty {
+  background:
+    radial-gradient(400px 200px at 50% 0%, rgba(95, 200, 134, 0.10), transparent 70%),
+    var(--color-surface-elevated);
+}
+
+/* Progress card del portal: ajuste del wash diagonal. */
+[data-theme='dark'] .progress-card {
+  background:
+    linear-gradient(135deg, rgba(95, 200, 134, 0.08) 0%, var(--color-surface-elevated) 60%),
+    var(--color-surface-elevated);
+}
+
+[data-theme='dark'] .progress-card__ring::after {
+  background: var(--color-surface-elevated);
+}
+
+/* Auth-card panel: invertimos a un wash mas profundo en dark. */
+[data-theme='dark'] .auth-card__panel {
+  background: linear-gradient(135deg, #06201d 0%, #0a3a33 50%, #0a4d3a 100%);
+}
+
+/* Inputs en dark: fondo de la propia card pero ligeramente mas claro para
+   no se confundan con el panel en el que estan inmersos. */
+[data-theme='dark'] .form-grid input,
+[data-theme='dark'] .form-grid select,
+[data-theme='dark'] .form-grid textarea,
+[data-theme='dark'] .form-row input,
+[data-theme='dark'] .filters input,
+[data-theme='dark'] .filters select,
+[data-theme='dark'] .auth-card__field input,
+[data-theme='dark'] .card-section-head__actions input {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-on-surface);
+}
+
+/* Sombras de botones primario/accent: en dark las sombras tinted no
+   contrastan; usamos negro puro. */
+[data-theme='dark'] .btn--primary {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 4px 14px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='dark'] .btn--primary:hover:not([disabled]) {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 8px 22px rgba(0, 0, 0, 0.65);
+}
+
+[data-theme='dark'] .btn--accent {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 4px 14px rgba(0, 0, 0, 0.50);
+}
+
+[data-theme='dark'] .auth-card__submit {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+}
+
+/* Module-list: el numero contador con gradiente claro perdia color del
+   texto en dark. Forzamos texto oscuro para asegurar legibilidad. */
+[data-theme='dark'] .module-list li::before {
+  color: #062420;
+}
+
+/* Placeholders mas tenues en dark. */
+[data-theme='dark'] ::placeholder {
+  color: var(--color-on-surface-muted);
+  opacity: 0.6;
 }
 
 @media (max-width: 720px) {

@@ -2,11 +2,12 @@ import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
+import { ThemeToggleComponent } from './theme-toggle.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, ThemeToggleComponent],
   template: `
     <header class="shell-topbar">
       <div class="shell-topbar__brand">
@@ -23,6 +24,7 @@ import { AuthService } from '../core/auth.service';
       </div>
 
       <div class="shell-topbar__user" *ngIf="auth.user() as u">
+        <app-theme-toggle />
         <div class="shell-topbar__user-info">
           <span class="shell-topbar__user-email">{{ u.email }}</span>
           <span class="shell-topbar__user-role">{{ u.role }}</span>

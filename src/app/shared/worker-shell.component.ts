@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
+import { ThemeToggleComponent } from './theme-toggle.component';
 
 @Component({
   selector: 'app-worker-shell',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, ThemeToggleComponent],
   template: `
     <div class="worker-shell">
       <header class="brand-header">
@@ -16,6 +17,7 @@ import { AuthService } from '../core/auth.service';
             <p class="brand-header__name">Portal del trabajador</p>
             <p class="brand-header__tagline">HASES · Tu ingreso paso a paso</p>
           </div>
+          <app-theme-toggle />
           <button
             *ngIf="auth.user()"
             class="shell-topbar__logout"
