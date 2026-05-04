@@ -99,74 +99,93 @@
   --table-row-hover-b: rgba(232, 245, 236, 0.18);
 }
 
-/* ===== Tokens — Dark theme ===============================================
-   Se activa cuando html[data-theme='dark']. Mantenemos los mismos nombres
-   de variable que el tema claro: cualquier componente existente "se ajusta"
-   sin tocar selectores. Los acentos teal/verde se conservan, pero los
-   neutros se invierten a un teal-noche para preservar la identidad. */
+/* ===== Tokens — Dark theme "Operacion Nocturna" =========================
+   Diseno generado por Stitch: en lugar de un dark monocromatico verde,
+   usamos neutrales slate/gunmetal con tinte teal muy sutil + dos acentos
+   complementarios (coral cobre y violeta) para diferenciar estados sin
+   recurrir a mas variantes de verde. El primary teal se mantiene como
+   anchor de marca, pero se ilumina (#5dd2ba) para legibilidad sobre
+   superficies oscuras. */
 :root[data-theme='dark'] {
-  --color-primary: #4cbfaa;
-  --color-primary-deep: #6dd9c2;
-  --color-primary-hover: #62cdb6;
-  --color-primary-muted: #1d3a36;
-  --color-on-primary: #062420;
+  --color-primary: #5dd2ba;
+  --color-primary-deep: #7ee0cb;
+  --color-primary-hover: #6cdac4;
+  --color-primary-muted: #0e3a35;
+  --color-on-primary: #051e1a;
 
-  --color-accent: #5fc886;
-  --color-accent-strong: #97f3b3;
-  --color-accent-soft: #15302a;
-  --color-accent-fixed: #1f4a36;
+  --color-accent: #86efac;
+  --color-accent-strong: #a7f3c5;
+  --color-accent-soft: #0f3a26;
+  --color-accent-fixed: #1a5237;
 
-  --color-surface: #0a1614;
-  --color-surface-mint: #112621;
-  --color-surface-elevated: #122220;
-  --color-surface-low: #0d1c1a;
-  --color-surface-header: #061513;
+  /* Neutrales slate con muy ligero tinte teal — NUNCA negro puro.
+     De canvas (mas oscuro) a elevated (mas claro). */
+  --color-surface: #0b1220;
+  --color-surface-mint: #0f1a2c;
+  --color-surface-elevated: #162033;
+  --color-surface-low: #0d1729;
+  --color-surface-header: #0a1120;
 
-  --color-on-surface: #e2efeb;
-  --color-on-surface-strong: #f3faf7;
-  --color-on-surface-secondary: #a8bcb6;
-  --color-on-surface-muted: #7d918b;
-  --color-on-surface-header: #f1faf7;
+  --color-on-surface: #e2e8f0;
+  --color-on-surface-strong: #f1f5f9;
+  --color-on-surface-secondary: #94a3b8;
+  --color-on-surface-muted: #64748b;
+  --color-on-surface-header: #f1f5f9;
 
-  --color-outline: #1f3531;
-  --color-outline-strong: #2a4540;
+  --color-outline: #1e293b;
+  --color-outline-strong: #334155;
 
-  --color-link: #6dd9c2;
-  --color-link-hover: #97f3b3;
-  --color-focus-ring: #5fc886;
+  --color-link: #7ee0cb;
+  --color-link-hover: #a7f3c5;
+  --color-focus-ring: #5dd2ba;
 
-  --color-error: #ff8a82;
-  --color-error-strong: #ffb3ac;
-  --color-error-container: #4d1812;
+  --color-error: #f87171;
+  --color-error-strong: #fca5a5;
+  --color-error-container: #3a1414;
 
-  --color-success: #6dd9a0;
-  --color-warning: #ffc372;
-  --color-warning-container: #3d2706;
-  --color-info: #7fb6e8;
-  --color-info-container: #0c2a44;
+  --color-success: #86efac;
+  /* Warning ahora es coral cobre (#fb923c) — recomendacion Stitch:
+     introduce calidez para "decision pendiente" / atencion humana sin
+     caer en amarillo plano y rompe la monotonia verde. */
+  --color-warning: #fb923c;
+  --color-warning-container: #3a1f0a;
+  --color-info: #93c5fd;
+  --color-info-container: #1a2940;
 
-  --color-disabled-text: #5d706c;
+  /* Acentos NUEVOS para enriquecer badges y estados — solo activos en
+     modo oscuro, donde la diferenciacion fina es mas dificil. */
+  --color-coral: #fb923c;
+  --color-coral-strong: #fdba74;
+  --color-coral-soft: rgba(251, 146, 60, 0.16);
+  --color-violet: #a78bfa;
+  --color-violet-strong: #c4b5fd;
+  --color-violet-soft: rgba(167, 139, 250, 0.16);
 
-  /* Sombras mas profundas (negro puro) en oscuro: las sombras tintadas
-     dejan de funcionar bien sobre fondos oscuros. */
+  --color-disabled-text: #475569;
+
+  /* Sombras de negro puro: las tintadas pierden efecto en oscuro. */
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.45);
-  --shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.55);
-  --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.55);
-  --shadow-focus: 0 0 0 3px rgba(95, 200, 134, 0.35);
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.50);
+  --shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.60);
+  --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.60);
+  --shadow-focus: 0 0 0 3px rgba(93, 210, 186, 0.35);
 
-  --body-bg-radial-a: rgba(95, 200, 134, 0.10);
-  --body-bg-radial-b: rgba(76, 191, 170, 0.08);
+  /* Wash radial sobre slate: teal sutil arriba-izquierda + violeta muy
+     leve arriba-derecha. Da profundidad atmosferica sin distraer. */
+  --body-bg-radial-a: rgba(76, 191, 170, 0.10);
+  --body-bg-radial-b: rgba(167, 139, 250, 0.06);
 
-  --topbar-grad-start: #0a1c1a;
-  --topbar-grad-end: #04110f;
+  /* Topbar slate-900 -> slate-950 (no teal puro). */
+  --topbar-grad-start: #0f172a;
+  --topbar-grad-end: #0a1120;
 
-  --sidebar-glass-a: rgba(13, 28, 26, 0.92);
-  --sidebar-glass-b: rgba(10, 22, 20, 0.92);
-  --sidebar-fade: rgba(10, 22, 20, 0.95);
+  /* Sidebar slate translucido. */
+  --sidebar-glass-a: rgba(15, 23, 42, 0.92);
+  --sidebar-glass-b: rgba(11, 18, 32, 0.92);
+  --sidebar-fade: rgba(11, 18, 32, 0.95);
 
-  --table-row-hover-a: rgba(95, 200, 134, 0.10);
-  --table-row-hover-b: rgba(95, 200, 134, 0.04);
+  --table-row-hover-a: rgba(93, 210, 186, 0.10);
+  --table-row-hover-b: rgba(93, 210, 186, 0.04);
 
   color-scheme: dark;
 }
@@ -2708,90 +2727,114 @@ a.kpi-card:hover .kpi-card__icon {
      oscuro las invertimos a fondos translucidos para conservar la lectura. */
 }
 
+/* Pipeline (7 estados) — recomendacion Stitch:
+   - applied: slate neutral (no es teal, marca "recien llegado")
+   - docs: teal HASES (validacion documental)
+   - interview: VIOLETA amortiguado (rompe la monotonia verde y
+     diferencia inmediatamente del estado de docs)
+   - decision: CORAL cobre (atencion humana, calido)
+   - induction: verde brillante (proceso en curso de exito)
+   - onboarding: gradient teal -> verde (estado "premium" de cierre)
+   - rejected: rojo amortiguado */
 [data-theme='dark'] .badge--status-applied {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cdd9d6;
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
 }
 [data-theme='dark'] .badge--status-docs {
-  background: rgba(95, 200, 134, 0.14);
-  color: #97f3b3;
+  background: rgba(93, 210, 186, 0.14);
+  color: #7ee0cb;
+  box-shadow: inset 0 0 0 1px rgba(93, 210, 186, 0.28);
 }
 [data-theme='dark'] .badge--status-interview {
-  background: rgba(151, 243, 179, 0.16);
-  color: #b9f6cb;
+  background: var(--color-violet-soft);
+  color: var(--color-violet-strong);
+  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.32);
 }
 [data-theme='dark'] .badge--status-decision {
-  background: rgba(255, 195, 114, 0.14);
-  color: #ffc372;
+  background: var(--color-coral-soft);
+  color: var(--color-coral-strong);
+  box-shadow: inset 0 0 0 1px rgba(251, 146, 60, 0.32);
 }
 [data-theme='dark'] .badge--status-induction {
-  background: rgba(95, 200, 134, 0.22);
-  color: #d8ffe6;
+  background: rgba(134, 239, 172, 0.18);
+  color: #a7f3c5;
+  box-shadow: inset 0 0 0 1px rgba(134, 239, 172, 0.32);
 }
 [data-theme='dark'] .badge--status-onboarding {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-  color: #062420;
+  color: #051e1a;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 4px 14px rgba(93, 210, 186, 0.18);
 }
 [data-theme='dark'] .badge--status-rejected {
-  background: rgba(255, 138, 130, 0.16);
-  color: #ffb3ac;
+  background: rgba(248, 113, 113, 0.14);
+  color: #fca5a5;
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.32);
 }
 
-/* Texto del avatar: en dark, los gradientes son colores claros, asi que
-   el texto blanco no contrasta. Lo cambiamos a un teal-noche legible. */
+/* Texto del avatar: en dark los gradientes son colores claros, asi que
+   el texto blanco no contrasta. Slate-950 oscuro sobre teal claro tiene
+   mejor contraste (recomendacion Stitch). */
 [data-theme='dark'] .avatar,
 [data-theme='dark'] .shell-topbar__avatar,
 [data-theme='dark'] .brand-header__logo,
 [data-theme='dark'] .shell-topbar__logo {
-  color: #062420;
+  color: #051e1a;
 }
 
 [data-theme='dark'] .shell-topbar__user-role {
-  background: rgba(151, 243, 179, 0.12);
-  color: var(--color-accent-strong);
+  background: rgba(93, 210, 186, 0.14);
+  color: var(--color-primary-deep);
+  box-shadow: inset 0 0 0 1px rgba(93, 210, 186, 0.28);
 }
 
 [data-theme='dark'] .shell-topbar__avatar {
-  border-color: rgba(151, 243, 179, 0.28);
+  border-color: rgba(93, 210, 186, 0.28);
 }
 
 [data-theme='dark'] .shell-topbar__logout {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--color-on-surface);
 }
 
 [data-theme='dark'] .shell-topbar__logout:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(151, 243, 179, 0.40);
+  background: rgba(93, 210, 186, 0.10);
+  border-color: rgba(93, 210, 186, 0.40);
+  color: var(--color-primary-deep);
 }
 
-/* La linea inferior decorativa de la topbar pierde contraste en oscuro;
-   la subimos un poco. */
+/* La linea inferior decorativa de la topbar: en oscuro mantiene presencia
+   pero la subimos para resaltar sobre slate. */
 [data-theme='dark'] .shell-topbar::after {
   opacity: 0.85;
 }
 
-/* KPI card icon en dark: los gradientes claros perdian peso. */
+/* KPI card icon en dark: gradiente teal -> coral muy sutil en lugar de
+   teal -> verde, para introducir el segundo acento en zonas premium. */
 [data-theme='dark'] .kpi-card__icon {
-  background: linear-gradient(135deg, rgba(95, 200, 134, 0.18) 0%, rgba(76, 191, 170, 0.22) 100%);
+  background: linear-gradient(135deg, rgba(93, 210, 186, 0.18) 0%, rgba(251, 146, 60, 0.16) 100%);
   color: var(--color-primary-deep);
-  box-shadow: inset 0 0 0 1px rgba(95, 200, 134, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(93, 210, 186, 0.18);
 }
 
 [data-theme='dark'] .kpi-card::after {
-  background: radial-gradient(circle at top right, rgba(95, 200, 134, 0.16), transparent 65%);
+  background: radial-gradient(circle at top right, rgba(93, 210, 186, 0.16), transparent 65%);
 }
 
-/* Empty states: el wash claro no contrasta sobre fondo oscuro. */
+/* Empty states: wash teal sutil sobre slate. */
 [data-theme='dark'] .empty {
   background:
-    radial-gradient(400px 200px at 50% 0%, rgba(95, 200, 134, 0.10), transparent 70%),
+    radial-gradient(400px 200px at 50% 0%, rgba(93, 210, 186, 0.10), transparent 70%),
     var(--color-surface-elevated);
 }
 
-/* Progress card del portal: ajuste del wash diagonal. */
+/* Progress card del portal: el wash diagonal ahora introduce un toque
+   coral en la esquina derecha para enriquecer la paleta. */
 [data-theme='dark'] .progress-card {
   background:
-    linear-gradient(135deg, rgba(95, 200, 134, 0.08) 0%, var(--color-surface-elevated) 60%),
+    linear-gradient(135deg, rgba(93, 210, 186, 0.08) 0%, var(--color-surface-elevated) 50%, rgba(251, 146, 60, 0.05) 100%),
     var(--color-surface-elevated);
 }
 
@@ -2799,13 +2842,13 @@ a.kpi-card:hover .kpi-card__icon {
   background: var(--color-surface-elevated);
 }
 
-/* Auth-card panel: invertimos a un wash mas profundo en dark. */
+/* Auth-card panel: gradient slate -> teal -> teal-deep en lugar del verde
+   brillante anterior. Mas elegante y coherente con la nueva direccion. */
 [data-theme='dark'] .auth-card__panel {
-  background: linear-gradient(135deg, #06201d 0%, #0a3a33 50%, #0a4d3a 100%);
+  background: linear-gradient(135deg, #0b1220 0%, #0f3a35 60%, #0e5e54 100%);
 }
 
-/* Inputs en dark: fondo de la propia card pero ligeramente mas claro para
-   no se confundan con el panel en el que estan inmersos. */
+/* Inputs en dark: fondo translucido sobre la card. */
 [data-theme='dark'] .form-grid input,
 [data-theme='dark'] .form-grid select,
 [data-theme='dark'] .form-grid textarea,
@@ -2818,8 +2861,7 @@ a.kpi-card:hover .kpi-card__icon {
   color: var(--color-on-surface);
 }
 
-/* Sombras de botones primario/accent: en dark las sombras tinted no
-   contrastan; usamos negro puro. */
+/* Sombras de botones: negro puro en dark. */
 [data-theme='dark'] .btn--primary {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.08) inset,
@@ -2842,16 +2884,75 @@ a.kpi-card:hover .kpi-card__icon {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
 }
 
-/* Module-list: el numero contador con gradiente claro perdia color del
-   texto en dark. Forzamos texto oscuro para asegurar legibilidad. */
+/* Module-list: contador sobre gradiente claro con texto slate-950. */
 [data-theme='dark'] .module-list li::before {
-  color: #062420;
+  color: #051e1a;
 }
 
 /* Placeholders mas tenues en dark. */
 [data-theme='dark'] ::placeholder {
   color: var(--color-on-surface-muted);
   opacity: 0.6;
+}
+
+/* Pipeline timeline: el conector y el nodo activo ya usan vars, pero el
+   ring pulsante en dark luce mejor con el nuevo teal claro. */
+[data-theme='dark'] .pipeline-timeline__node {
+  background: var(--color-surface-elevated);
+  border-color: var(--color-outline-strong);
+}
+
+/* Theme toggle: en dark el knob es lavanda+teal en lugar de azul plano
+   para reforzar la idea de "modo nocturno" sin recurrir a mas verde. */
+[data-theme='dark'] .theme-toggle--inverse {
+  background: linear-gradient(135deg, var(--color-surface-elevated) 0%, var(--color-surface-mint) 100%);
+  border-color: var(--color-outline-strong);
+}
+
+[data-theme='dark'] .theme-toggle[aria-pressed='true'] .theme-toggle__knob {
+  background: linear-gradient(135deg, var(--color-violet) 0%, var(--color-primary) 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(167, 139, 250, 0.30),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* Vacancy list y module list: cuando estan en hover, en dark agregamos
+   un shadow tintado teal para reforzar la jerarquia. */
+[data-theme='dark'] .vacancy-list__item:hover,
+[data-theme='dark'] .module-list li:hover {
+  border-color: rgba(93, 210, 186, 0.32);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+/* Cards: borde sutil + shadow profunda. */
+[data-theme='dark'] .card {
+  border-color: var(--color-outline);
+}
+
+[data-theme='dark'] .card:hover {
+  border-color: rgba(93, 210, 186, 0.22);
+}
+
+/* Tabla: header con tinte teal muy bajo en lugar del soft-mint del modo claro. */
+[data-theme='dark'] table thead th {
+  background: linear-gradient(180deg, var(--color-surface-mint) 0%, var(--color-surface-elevated) 100%);
+  color: var(--color-on-surface-strong);
+  border-bottom-color: var(--color-outline-strong);
+}
+
+/* Sidebar item activo: gradient teal -> coral muy sutil para introducir
+   el segundo acento en navegacion (recomendacion Stitch). */
+[data-theme='dark'] .shell-side a.is-active {
+  background: linear-gradient(90deg, rgba(93, 210, 186, 0.18) 0%, rgba(251, 146, 60, 0.10) 100%);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+  color: var(--color-primary-deep);
+}
+
+/* Chip-list (tags por vacante en filtros): borde sutil con tinte teal en dark. */
+[data-theme='dark'] .chip-list li {
+  background: var(--color-surface-mint);
+  border-color: var(--color-outline-strong);
 }
 
 @media (max-width: 720px) {
