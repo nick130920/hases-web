@@ -2,12 +2,26 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
+import { ToastService } from '../../core/toast.service';
 import {
   OverdueApplication,
   statusBadgeClass,
   statusLabel,
 } from '../../core/types';
+
+/**
+ * Identificadores de los reportes descargables. Sirven como llave para el
+ * mapa de "descargas en curso" y para mostrar el spinner solo en la card
+ * que el usuario pulsó.
+ */
+type ReportKey =
+  | 'applications'
+  | 'pipeline-time'
+  | 'ips-monthly'
+  | 'onboarding-completed';
 
 @Component({
   selector: 'app-reports',
@@ -24,24 +38,45 @@ import {
       </header>
 
       <div class="kpi-grid">
-        <a class="kpi-card" [href]="api.reportApplicationsUrl()" target="_blank">
-          <span class="kpi-card__icon"><span class="icon">groups</span></span>
+        <button
+          type="button"
+          class="kpi-card"
+          [disabled]="busy('applications')"
+          (click)="download('applications', api.reportApplications(), 'postulaciones.csv')"
+        >
+          <span class="kpi-card__icon">
+            <span class="icon">{{ busy('applications') ? 'progress_activity' : 'groups' }}</span>
+          </span>
           <span class="kpi-card__label">Postulaciones</span>
-          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__value">{{ busy('applications') ? 'Descargando…' : 'Excel' }}</span>
           <span class="kpi-card__hint">Lista completa de candidatos</span>
-        </a>
-        <a class="kpi-card" [href]="api.reportPipelineTimeUrl()" target="_blank">
-          <span class="kpi-card__icon"><span class="icon">schedule</span></span>
+        </button>
+        <button
+          type="button"
+          class="kpi-card"
+          [disabled]="busy('pipeline-time')"
+          (click)="download('pipeline-time', api.reportPipelineTime(), 'duracion-por-etapa.csv')"
+        >
+          <span class="kpi-card__icon">
+            <span class="icon">{{ busy('pipeline-time') ? 'progress_activity' : 'schedule' }}</span>
+          </span>
           <span class="kpi-card__label">Duración por etapa</span>
-          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__value">{{ busy('pipeline-time') ? 'Descargando…' : 'Excel' }}</span>
           <span class="kpi-card__hint">Cuánto tarda cada fase del proceso</span>
-        </a>
-        <a class="kpi-card kpi-card--soft" [href]="api.reportIPSMonthlyUrl()" target="_blank">
-          <span class="kpi-card__icon"><span class="icon">medical_services</span></span>
+        </button>
+        <button
+          type="button"
+          class="kpi-card kpi-card--soft"
+          [disabled]="busy('ips-monthly')"
+          (click)="download('ips-monthly', api.reportIPSMonthly(), 'examenes-medicos.csv')"
+        >
+          <span class="kpi-card__icon">
+            <span class="icon">{{ busy('ips-monthly') ? 'progress_activity' : 'medical_services' }}</span>
+          </span>
           <span class="kpi-card__label">Exámenes médicos del mes</span>
-          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__value">{{ busy('ips-monthly') ? 'Descargando…' : 'Excel' }}</span>
           <span class="kpi-card__hint">Resultados de la IPS</span>
-        </a>
+        </button>
       </div>
 
       <article class="card card--accent">
@@ -58,9 +93,9 @@ import {
             Hasta
             <input type="date" [(ngModel)]="to" name="to" />
           </label>
-          <button class="btn btn--primary" type="submit">
-            <span class="icon icon--sm">download</span>
-            Descargar Excel
+          <button class="btn btn--primary" type="submit" [disabled]="busy('onboarding-completed')">
+            <span class="icon icon--sm">{{ busy('onboarding-completed') ? 'progress_activity' : 'download' }}</span>
+            {{ busy('onboarding-completed') ? 'Descargando…' : 'Descargar Excel' }}
           </button>
         </form>
       </article>
@@ -122,11 +157,19 @@ import {
 })
 export class ReportsComponent implements OnInit {
   protected readonly api = inject(ApiService);
+  private readonly toast = inject(ToastService);
+
   overdue = signal<OverdueApplication[]>([]);
   from = '';
   to = '';
   statusLabel = statusLabel;
   badgeClass = statusBadgeClass;
+
+  /**
+   * Descargas en curso. Se mantienen en una signal para que el botón
+   * correspondiente muestre estado de carga sin afectar a las demás cards.
+   */
+  private readonly downloading = signal<Set<ReportKey>>(new Set());
 
   initials(o: OverdueApplication): string {
     const f = (o.first_name?.[0] ?? '').toUpperCase();
@@ -138,8 +181,109 @@ export class ReportsComponent implements OnInit {
     this.api.listOverdueApplications().subscribe({ next: (o) => this.overdue.set(o ?? []) });
   }
 
-  downloadOnboarding(): void {
-    const url = this.api.reportOnboardingCompletedUrl(this.from || undefined, this.to || undefined);
-    window.open(url, '_blank');
+  busy(key: ReportKey): boolean {
+    return this.downloading().has(key);
   }
+
+  /**
+   * Lanza la descarga autenticada de un reporte y dispara el guardado del
+   * archivo en el navegador. El `fallbackName` se usa si el backend no
+   * adjunta `Content-Disposition`.
+   */
+  download(
+    key: ReportKey,
+    request$: Observable<HttpResponse<Blob>>,
+    fallbackName: string,
+  ): void {
+    if (this.busy(key)) return;
+    this.markBusy(key, true);
+    request$.subscribe({
+      next: (res) => {
+        const filename = filenameFromResponse(res, fallbackName);
+        const blob = res.body ?? new Blob([], { type: 'text/csv' });
+        triggerBlobDownload(blob, filename);
+        this.markBusy(key, false);
+      },
+      error: (err: unknown) => {
+        this.markBusy(key, false);
+        this.toast.error(humanizeDownloadError(err));
+      },
+    });
+  }
+
+  downloadOnboarding(): void {
+    this.download(
+      'onboarding-completed',
+      this.api.reportOnboardingCompleted(this.from || undefined, this.to || undefined),
+      'onboarding-completados.csv',
+    );
+  }
+
+  private markBusy(key: ReportKey, busy: boolean): void {
+    this.downloading.update((current) => {
+      const next = new Set(current);
+      if (busy) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }
+}
+
+/**
+ * Crea un enlace temporal a un blob y simula un clic para forzar la
+ * descarga con el nombre indicado. El `URL.revokeObjectURL` libera la
+ * memoria reservada por el navegador.
+ */
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/**
+ * Extrae el nombre de archivo del header `Content-Disposition`. Soporta
+ * las variantes `filename="x.csv"` y `filename*=UTF-8''x.csv` (RFC 5987).
+ * Si nada coincide se devuelve el `fallback` indicado por el llamador.
+ */
+function filenameFromResponse(
+  res: HttpResponse<Blob>,
+  fallback: string,
+): string {
+  const header = res.headers.get('Content-Disposition') ?? '';
+  const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (utf8?.[1]) {
+    try {
+      return decodeURIComponent(utf8[1].trim().replace(/(^"|"$)/g, ''));
+    } catch {
+      // si la decodificación falla, intentamos con el formato simple
+    }
+  }
+  const simple = /filename="?([^";]+)"?/i.exec(header);
+  if (simple?.[1]) return simple[1].trim();
+  return fallback;
+}
+
+/**
+ * Convierte un error HTTP en un mensaje claro para el usuario. Diferencia
+ * los casos típicos (sin sesión, sin permisos, sin datos en el rango) del
+ * fallback genérico.
+ */
+function humanizeDownloadError(err: unknown): string {
+  if (err instanceof HttpErrorResponse) {
+    if (err.status === 401) {
+      return 'Tu sesión expiró. Vuelve a iniciar sesión para descargar el reporte.';
+    }
+    if (err.status === 403) {
+      return 'No tienes permiso para descargar este reporte.';
+    }
+    if (err.status === 404) {
+      return 'El reporte no está disponible en este momento.';
+    }
+  }
+  return 'No se pudo descargar el reporte. Intenta de nuevo en unos segundos.';
 }

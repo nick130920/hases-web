@@ -907,6 +907,9 @@ button {
   text-decoration: none;
   color: inherit;
   box-shadow: var(--shadow-card);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
   transition:
     transform var(--motion-normal) var(--easing-standard),
     box-shadow var(--motion-normal) var(--easing-standard),
@@ -939,11 +942,28 @@ button {
   z-index: -1;
 }
 
-a.kpi-card:hover {
+.kpi-card:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card-hover);
   border-color: rgba(45, 138, 84, 0.32);
   text-decoration: none;
+}
+
+.kpi-card:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+/* Spinner reutilizable para el icono de progreso (Material Symbols
+   "progress_activity") cuando aparece dentro de una card o botón ocupado. */
+@keyframes hases-spin {
+  to { transform: rotate(360deg); }
+}
+
+.kpi-card:disabled .kpi-card__icon .icon,
+.btn:disabled .icon.icon--sm {
+  animation: hases-spin 0.9s linear infinite;
+  transform-origin: center;
 }
 
 .kpi-card--soft::before {
@@ -972,7 +992,7 @@ a.kpi-card:hover {
   transition: transform var(--motion-normal) var(--easing-standard);
 }
 
-a.kpi-card:hover .kpi-card__icon {
+.kpi-card:hover:not(:disabled) .kpi-card__icon {
   transform: scale(1.05) rotate(-2deg);
 }
 

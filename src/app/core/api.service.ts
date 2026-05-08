@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -408,20 +408,40 @@ export class ApiService {
   }
 
   // ----- Reportes ampliados -----
-  reportPipelineTimeUrl(): string {
-    return `${this.base}/reports/pipeline-time.csv`;
+  /**
+   * Descarga un reporte CSV con el bearer token del usuario.
+   *
+   * Se usa `responseType: 'blob'` y `observe: 'response'` para tener acceso
+   * al header `Content-Disposition` y rescatar el nombre original del
+   * archivo cuando el backend lo expone.
+   */
+  private downloadCsv(
+    path: string,
+    params?: Record<string, string>,
+  ): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.base}${path}`, {
+      responseType: 'blob',
+      observe: 'response',
+      params,
+    });
   }
-  reportIPSMonthlyUrl(): string {
-    return `${this.base}/reports/ips-monthly.csv`;
+
+  reportApplications(): Observable<HttpResponse<Blob>> {
+    return this.downloadCsv('/reports/applications.csv');
   }
-  reportOnboardingCompletedUrl(from?: string, to?: string): string {
-    const qs = new URLSearchParams();
-    if (from) qs.set('from', from);
-    if (to) qs.set('to', to);
-    const tail = qs.toString() ? `?${qs.toString()}` : '';
-    return `${this.base}/reports/onboarding-completed.csv${tail}`;
+  reportPipelineTime(): Observable<HttpResponse<Blob>> {
+    return this.downloadCsv('/reports/pipeline-time.csv');
   }
-  reportApplicationsUrl(): string {
-    return `${this.base}/reports/applications.csv`;
+  reportIPSMonthly(): Observable<HttpResponse<Blob>> {
+    return this.downloadCsv('/reports/ips-monthly.csv');
+  }
+  reportOnboardingCompleted(
+    from?: string,
+    to?: string,
+  ): Observable<HttpResponse<Blob>> {
+    const params: Record<string, string> = {};
+    if (from) params['from'] = from;
+    if (to) params['to'] = to;
+    return this.downloadCsv('/reports/onboarding-completed.csv', params);
   }
 }
