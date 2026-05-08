@@ -77,6 +77,50 @@ const FUNNEL_STAGES: FunnelStage[] = [
         </p>
       </header>
 
+      <article class="card card--accent" style="margin-bottom: 22px;">
+        <div class="card-section-head">
+          <h2>Acciones rápidas</h2>
+        </div>
+        <div class="quick-actions">
+          <a class="quick-action" routerLink="/applications" [queryParams]="{ status: 'docs_review' }">
+            <span class="quick-action__icon">
+              <span class="icon">fact_check</span>
+            </span>
+            <span style="flex:1; min-width:0;">
+              <span class="quick-action__title">Revisar documentos</span>
+              <span class="quick-action__hint">{{ docsToReview() }} en revisión</span>
+            </span>
+          </a>
+          <a class="quick-action" routerLink="/vacancies">
+            <span class="quick-action__icon">
+              <span class="icon">add_circle</span>
+            </span>
+            <span style="flex:1; min-width:0;">
+              <span class="quick-action__title">Crear vacante</span>
+              <span class="quick-action__hint">Publica un nuevo cargo</span>
+            </span>
+          </a>
+          <a class="quick-action" routerLink="/reports">
+            <span class="quick-action__icon">
+              <span class="icon">timer</span>
+            </span>
+            <span style="flex:1; min-width:0;">
+              <span class="quick-action__title">Ver SLAs</span>
+              <span class="quick-action__hint">Atrasos del pipeline</span>
+            </span>
+          </a>
+          <a class="quick-action" routerLink="/induction">
+            <span class="quick-action__icon">
+              <span class="icon">school</span>
+            </span>
+            <span style="flex:1; min-width:0;">
+              <span class="quick-action__title">Editar inducción</span>
+              <span class="quick-action__hint">Módulos y recursos</span>
+            </span>
+          </a>
+        </div>
+      </article>
+
       <div class="kpi-grid">
         <a class="kpi-card" routerLink="/vacancies">
           <span class="kpi-card__icon"><span class="icon">work</span></span>
@@ -196,6 +240,9 @@ export class DashboardComponent implements OnInit {
     () => this.applications().filter((a) => a.status === 'onboarding_complete').length
   );
   recent = computed(() => this.applications().slice(0, 8));
+  docsToReview = computed(
+    () => this.applications().filter((a) => a.status === 'docs_review').length
+  );
 
   funnel = computed(() => {
     const apps = this.applications();

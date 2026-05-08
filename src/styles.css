@@ -2955,6 +2955,419 @@ a.kpi-card:hover .kpi-card__icon {
   border-color: var(--color-outline-strong);
 }
 
+/* ==========================================================================
+   Hero "Próxima acción" — guidance contextual por estado
+   ========================================================================== */
+.next-action {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  background: linear-gradient(135deg, var(--color-accent-soft) 0%, var(--color-surface-elevated) 100%);
+  border: 1px solid var(--color-outline);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-card);
+}
+
+.next-action__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(14, 94, 84, 0.22);
+}
+
+.next-action__icon .icon {
+  font-size: 1.75rem;
+}
+
+.next-action__body {
+  min-width: 0;
+}
+
+.next-action__eyebrow {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.next-action__title {
+  margin: 0 0 4px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-on-surface-strong);
+  line-height: 1.3;
+}
+
+.next-action__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-on-surface-secondary);
+  line-height: 1.45;
+}
+
+.next-action__cta {
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .next-action {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .next-action__icon {
+    width: 44px;
+    height: 44px;
+  }
+  .next-action__icon .icon {
+    font-size: 1.4rem;
+  }
+}
+
+/* ==========================================================================
+   Quick actions (dashboard)
+   ========================================================================== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--motion-fast) var(--easing-standard),
+    box-shadow var(--motion-fast) var(--easing-standard),
+    border-color var(--motion-fast) var(--easing-standard);
+}
+
+.quick-action:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--color-primary);
+  text-decoration: none;
+}
+
+.quick-action__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-accent-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quick-action__title {
+  display: block;
+  font-weight: 700;
+  color: var(--color-on-surface-strong);
+  font-size: 0.9375rem;
+}
+
+.quick-action__hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-on-surface-secondary);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Chips de filtro rápido
+   ========================================================================== */
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-on-surface-secondary);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--easing-standard),
+    color var(--motion-fast) var(--easing-standard),
+    border-color var(--motion-fast) var(--easing-standard);
+  font-family: inherit;
+}
+
+.filter-chip:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-primary);
+  border-color: var(--color-primary-muted);
+}
+
+.filter-chip.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+}
+
+.filter-chip.is-active .filter-chip__count {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--color-on-primary);
+}
+
+.filter-chip__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 0 6px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-primary-deep);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Tabs con badge de conteo
+   ========================================================================== */
+.tabs button .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-error-container);
+  color: var(--color-error-strong);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.tabs button.is-active .tab-count {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* ==========================================================================
+   Pipeline timeline interactivo
+   ========================================================================== */
+.pipeline-timeline--interactive .pipeline-timeline__step {
+  cursor: pointer;
+}
+
+.pipeline-timeline--interactive .pipeline-timeline__step:hover .pipeline-timeline__node {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pipeline-timeline--interactive .pipeline-timeline__step:hover .pipeline-timeline__name {
+  color: var(--color-primary);
+}
+
+/* ==========================================================================
+   Dropzone de archivo (auto-upload)
+   ========================================================================== */
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-outline-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--easing-standard),
+    border-color var(--motion-fast) var(--easing-standard);
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.dropzone:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-primary);
+}
+
+.dropzone[disabled],
+.dropzone.is-busy {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.dropzone__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--color-accent-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dropzone__title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-on-surface-strong);
+}
+
+.dropzone__hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-on-surface-muted);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Toast notifications (auto-dismiss)
+   ========================================================================== */
+.toast-stack {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 200;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  font-size: 0.875rem;
+  color: var(--color-on-surface-strong);
+  min-width: 260px;
+  max-width: 380px;
+  pointer-events: auto;
+  animation: toast-in 220ms var(--easing-standard);
+}
+
+.toast--success {
+  border-left-color: var(--color-accent);
+}
+
+.toast--success .toast__icon {
+  color: var(--color-accent-strong);
+}
+
+.toast--error {
+  border-left-color: var(--color-error);
+  background: var(--color-error-container);
+  color: var(--color-error-strong);
+}
+
+.toast--error .toast__icon {
+  color: var(--color-error-strong);
+}
+
+.toast--warning {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-container);
+}
+
+.toast--warning .toast__icon {
+  color: var(--color-warning);
+}
+
+.toast--info {
+  border-left-color: var(--color-info);
+}
+
+.toast--info .toast__icon {
+  color: var(--color-info);
+}
+
+.toast__icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.toast__text {
+  flex: 1;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.toast__close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  margin-top: 1px;
+}
+
+.toast__close:hover {
+  opacity: 1;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .toast-stack {
+    bottom: 96px; /* deja espacio al bottom-nav del worker portal */
+    right: 12px;
+    left: 12px;
+  }
+  .toast {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 720px) {
   .shell-layout {
     grid-template-columns: 1fr;

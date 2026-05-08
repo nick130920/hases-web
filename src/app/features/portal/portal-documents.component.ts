@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service';
 import { WorkerApiService } from '../../core/worker-api.service';
 import { ApplicationDetail, ApplicationDocument } from '../../core/types';
+import { ToastService } from '../../core/toast.service';
 import { environment } from '../../../environments/environment';
 
 interface UploadDraft {
   file?: File;
   issuedAt?: string;
+  busy?: boolean;
 }
 
 @Component({
@@ -20,7 +22,7 @@ interface UploadDraft {
       <header class="page-head">
         <h1 style="font-size: 1.5rem;">Mis documentos</h1>
         <p class="page-subtitle">
-          Sube los documentos solicitados. RR.HH. los revisará uno a uno.
+          Toca cada documento para subirlo desde tu celular o computador.
         </p>
       </header>
 
@@ -36,13 +38,10 @@ interface UploadDraft {
             {{ c.required_satisfied || 0 }} / {{ c.required_total || 0 }} obligatorios
           </p>
           <p class="progress-card__hint">
-            {{ c.with_file || 0 }} archivos cargados, {{ c.approved || 0 }} aprobados.
+            {{ pendingHint() }}
           </p>
         </div>
       </div>
-
-      <p class="success" *ngIf="ok">{{ ok }}</p>
-      <p class="error" *ngIf="error">{{ error }}</p>
 
       <div class="doc-cards">
         <article
@@ -81,33 +80,49 @@ interface UploadDraft {
             <a [href]="api.fileUrl(d.file_id)" target="_blank">Ver archivo cargado</a>
           </p>
 
-          <div class="doc-card__actions">
+          <label
+            *ngIf="d.requires_issued_at && !d.file_id"
+            class="doc-card__date-label"
+          >
+            Fecha de emisión
             <input
-              type="file"
-              [id]="'pf-' + d.checklist_item_id"
-              hidden
-              (change)="onFile(d, $event)"
-            />
-            <button class="btn btn--ghost" (click)="trigger('pf-' + d.checklist_item_id)">
-              <span class="icon icon--sm">attach_file</span>
-              {{ fileNameFor(d.checklist_item_id) || 'Elegir archivo' }}
-            </button>
-            <input
-              *ngIf="d.requires_issued_at"
               type="date"
               [(ngModel)]="drafts[d.checklist_item_id].issuedAt"
               [name]="'di-' + d.checklist_item_id"
-              class="doc-card__date"
             />
-            <button
-              class="btn btn--primary"
-              [disabled]="!fileFor(d.checklist_item_id)"
-              (click)="submit(d)"
-            >
-              <span class="icon icon--sm">cloud_upload</span>
-              Subir
-            </button>
-          </div>
+          </label>
+
+          <input
+            type="file"
+            [id]="'pf-' + d.checklist_item_id"
+            hidden
+            (change)="onFile(a.id, d, $event)"
+          />
+          <button
+            class="dropzone"
+            type="button"
+            [class.is-busy]="drafts[d.checklist_item_id].busy"
+            [disabled]="drafts[d.checklist_item_id].busy"
+            (click)="trigger('pf-' + d.checklist_item_id)"
+          >
+            <span class="dropzone__icon" aria-hidden="true">
+              <span class="icon">{{ d.file_id ? 'sync' : 'cloud_upload' }}</span>
+            </span>
+            <span style="flex:1; min-width:0;">
+              <span class="dropzone__title">
+                {{
+                  drafts[d.checklist_item_id].busy
+                    ? 'Subiendo…'
+                    : d.file_id
+                      ? 'Cambiar archivo'
+                      : 'Subir archivo'
+                }}
+              </span>
+              <span class="dropzone__hint">
+                {{ uploadHint(d) }}
+              </span>
+            </span>
+          </button>
         </article>
       </div>
     </ng-container>
@@ -146,18 +161,24 @@ interface UploadDraft {
         font-size: 0.9375rem;
         color: var(--color-on-surface-strong);
       }
-      .doc-card__actions {
+      .doc-card__date-label {
         display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 4px;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: var(--color-on-surface-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
       }
-      .doc-card__date {
+      .doc-card__date-label input {
         padding: 9px 12px;
         border: 1px solid var(--color-outline);
         border-radius: var(--radius-sm);
         font-family: inherit;
         font-size: 0.875rem;
+        text-transform: none;
+        letter-spacing: normal;
       }
     `,
   ],
@@ -165,16 +186,23 @@ interface UploadDraft {
 export class PortalDocumentsComponent implements OnInit {
   protected readonly api = inject(ApiService);
   private readonly worker = inject(WorkerApiService);
+  private readonly toast = inject(ToastService);
 
   app = signal<ApplicationDetail | null>(null);
   drafts: Record<string, UploadDraft> = {};
-  ok = '';
-  error = '';
 
   completionPct = computed(() => {
     const c = this.app()?.completeness;
     if (!c?.required_total) return 0;
     return Math.round((c.required_satisfied / c.required_total) * 100);
+  });
+
+  pendingHint = computed(() => {
+    const c = this.app()?.completeness;
+    if (!c) return '';
+    const missing = (c.required_total ?? 0) - (c.required_satisfied ?? 0);
+    if (missing <= 0) return '¡Todos los obligatorios están al día!';
+    return `Te falta${missing === 1 ? '' : 'n'} ${missing} obligatorio${missing === 1 ? '' : 's'}.`;
   });
 
   ngOnInit(): void {
@@ -196,13 +224,6 @@ export class PortalDocumentsComponent implements OnInit {
     return `${environment.apiUrl}/public/document-templates/${itemKey}`;
   }
 
-  fileFor(itemId: string): File | undefined {
-    return this.drafts[itemId]?.file;
-  }
-  fileNameFor(itemId: string): string {
-    return this.drafts[itemId]?.file?.name ?? '';
-  }
-
   trigger(id: string): void {
     document.getElementById(id)?.click();
   }
@@ -219,29 +240,49 @@ export class PortalDocumentsComponent implements OnInit {
         : 'badge--neutral';
   }
 
-  onFile(d: ApplicationDocument, ev: Event): void {
-    const file = (ev.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    this.drafts[d.checklist_item_id] = { ...this.drafts[d.checklist_item_id], file };
+  uploadHint(d: ApplicationDocument): string {
+    const draft = this.drafts[d.checklist_item_id];
+    if (d.requires_issued_at && !draft?.issuedAt && !d.file_id) {
+      return 'Indica la fecha de emisión arriba antes de subir.';
+    }
+    return 'Se sube automáticamente al elegir el archivo.';
   }
 
-  submit(d: ApplicationDocument): void {
-    const draft = this.drafts[d.checklist_item_id];
-    if (!draft?.file) return;
+  /**
+   * Auto-subida desde el portal: igual que en backoffice, al elegir archivo
+   * se carga inmediatamente. Si requiere fecha de emisión y no la capturó,
+   * mostramos toast y dejamos el archivo listo para reintento manual.
+   */
+  onFile(appId: string, d: ApplicationDocument, ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const draft = this.drafts[d.checklist_item_id] ?? {};
+    draft.file = file;
+    this.drafts[d.checklist_item_id] = draft;
+    input.value = '';
+
     if (d.requires_issued_at && !draft.issuedAt) {
-      this.error = `Debes indicar la fecha de emisión de "${d.label}".`;
+      this.toast.warning(`Indica la fecha de emisión de "${d.label}" antes de subir.`, 5000);
       return;
     }
-    this.error = '';
-    this.ok = '';
+
+    this.upload(appId, d);
+  }
+
+  private upload(_appId: string, d: ApplicationDocument): void {
+    const draft = this.drafts[d.checklist_item_id];
+    if (!draft?.file) return;
+    draft.busy = true;
     this.worker.uploadDocument(d.checklist_item_id, draft.file, draft.issuedAt).subscribe({
       next: () => {
-        this.ok = `"${d.label}" subido correctamente`;
         this.drafts[d.checklist_item_id] = {};
+        this.toast.success(`"${d.label}" subido correctamente`);
         this.refresh();
       },
       error: (e) => {
-        this.error = e?.error?.error ?? 'No se pudo subir';
+        draft.busy = false;
+        this.toast.error(e?.error?.error ?? 'No se pudo subir');
       },
     });
   }

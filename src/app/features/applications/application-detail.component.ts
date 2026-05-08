@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service';
+import { Tab } from '../../core/application-tabs';
+import { adminNextAction } from '../../core/next-action';
+import { ToastService } from '../../core/toast.service';
 import {
   ApplicationDetail,
   ApplicationDocument,
@@ -18,44 +21,40 @@ import {
 import { AuthService } from '../../core/auth.service';
 import { SignaturePadComponent } from '../../shared/signature-pad.component';
 
-type Tab =
-  | 'data'
-  | 'documents'
-  | 'interviews'
-  | 'occupational'
-  | 'hiring'
-  | 'induction'
-  | 'functional';
-
 interface UploadDraft {
   file?: File;
   issuedAt?: string;
+  busy?: boolean;
 }
 
 interface PipelinePhase {
   key: string;
   label: string;
   matches: string[];
+  tab: Tab;
 }
 
 const PIPELINE_PHASES: PipelinePhase[] = [
-  { key: 'apply', label: 'Postulación', matches: ['applied'] },
+  { key: 'apply', label: 'Postulación', matches: ['applied'], tab: 'data' },
   {
     key: 'docs',
     label: 'Documentos',
     matches: ['docs_pending', 'docs_incomplete', 'docs_review', 'docs_approved'],
+    tab: 'documents',
   },
   {
     key: 'interview',
     label: 'Entrevista',
     matches: ['interview_pending', 'interview_done'],
+    tab: 'interviews',
   },
   {
     key: 'occ',
     label: 'Ocupacional',
     matches: ['occ_pending', 'occ_sent', 'occ_result_received'],
+    tab: 'occupational',
   },
-  { key: 'decision', label: 'Decisión', matches: ['hiring_pending', 'hired', 'rejected'] },
+  { key: 'decision', label: 'Decisión', matches: ['hiring_pending', 'hired', 'rejected'], tab: 'hiring' },
   {
     key: 'induction',
     label: 'Inducción',
@@ -66,8 +65,9 @@ const PIPELINE_PHASES: PipelinePhase[] = [
       'induction_epp_pending',
       'induction_practice',
     ],
+    tab: 'induction',
   },
-  { key: 'onboarding', label: 'Onboarding', matches: ['onboarding_complete'] },
+  { key: 'onboarding', label: 'Onboarding', matches: ['onboarding_complete'], tab: 'functional' },
 ];
 
 @Component({
@@ -102,13 +102,38 @@ const PIPELINE_PHASES: PipelinePhase[] = [
         </div>
       </header>
 
+      <!-- Próxima acción contextual -->
+      <article class="next-action">
+        <div class="next-action__icon" aria-hidden="true">
+          <span class="icon">{{ nextAction().icon }}</span>
+        </div>
+        <div class="next-action__body">
+          <span class="next-action__eyebrow">Próxima acción</span>
+          <h2 class="next-action__title">{{ nextAction().title }}</h2>
+          <p class="next-action__hint">{{ nextAction().hint }}</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn--primary next-action__cta"
+          (click)="goTo(nextAction().tab)"
+        >
+          {{ nextAction().cta }}
+          <span class="icon icon--sm">arrow_forward</span>
+        </button>
+      </article>
+
       <article class="card" style="padding: 8px 18px;">
-        <div class="pipeline-timeline">
+        <div class="pipeline-timeline pipeline-timeline--interactive">
           <div
             *ngFor="let phase of phases(); let i = index"
             class="pipeline-timeline__step"
             [class.is-done]="phase.state === 'done'"
             [class.is-current]="phase.state === 'current'"
+            (click)="goTo(phase.tab)"
+            (keyup.enter)="goTo(phase.tab)"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Ir a ' + phase.label"
           >
             <div class="pipeline-timeline__node">
               <span *ngIf="phase.state === 'done'" class="icon icon--sm">check</span>
@@ -121,13 +146,14 @@ const PIPELINE_PHASES: PipelinePhase[] = [
 
       <div class="tabs">
         <button
-          *ngFor="let t of tabs"
+          *ngFor="let t of visibleTabs()"
           [class.is-active]="active === t.id"
           (click)="active = t.id"
           type="button"
         >
           <span class="icon icon--sm">{{ t.icon }}</span>
           {{ t.label }}
+          <span class="tab-count" *ngIf="tabCount(t.id, a) as n">{{ n }}</span>
         </button>
       </div>
 
@@ -187,7 +213,7 @@ const PIPELINE_PHASES: PipelinePhase[] = [
         </div>
         <table class="data-table data-table--docs">
           <thead>
-            <tr><th>Documento</th><th>Estado</th><th>Archivo</th><th>Acciones</th></tr>
+            <tr><th>Documento</th><th>Estado</th><th>Acciones</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let d of a.documents">
@@ -202,51 +228,69 @@ const PIPELINE_PHASES: PipelinePhase[] = [
                   Máx. {{ d.max_age_days }} días de antigüedad
                 </p>
                 <p class="muted" *ngIf="d.issued_at">Emitido: {{ d.issued_at }}</p>
+                <p *ngIf="d.file_id" style="margin: 6px 0 0;">
+                  <a [href]="api.fileUrl(d.file_id)" target="_blank">
+                    <span class="icon icon--sm">download</span> Descargar archivo
+                  </a>
+                </p>
               </td>
               <td>
                 <span class="badge" [class]="'badge ' + docBadgeClass(d.review_status)">
                   {{ docStatusLabel(d.review_status) }}
                 </span>
               </td>
-              <td>
-                <a *ngIf="d.file_id" [href]="api.fileUrl(d.file_id)" target="_blank">
-                  <span class="icon icon--sm">download</span> Descargar
-                </a>
-                <span *ngIf="!d.file_id" class="muted">Sin archivo</span>
-              </td>
               <td class="data-table__actions">
                 <input
-                  type="file"
-                  [id]="'file-' + d.checklist_item_id"
-                  hidden
-                  (change)="onDocFile(d, $event)"
-                />
-                <button class="btn btn--ghost" (click)="trigger('file-' + d.checklist_item_id)">
-                  <span class="icon icon--sm">attach_file</span>
-                  Elegir
-                </button>
-                <input
-                  *ngIf="d.requires_issued_at"
+                  *ngIf="d.requires_issued_at && !d.file_id"
                   type="date"
                   [(ngModel)]="docDrafts[d.checklist_item_id].issuedAt"
                   [name]="'di-' + d.checklist_item_id"
                 />
+                <input
+                  type="file"
+                  [id]="'file-' + d.checklist_item_id"
+                  hidden
+                  (change)="onDocFile(a.id, d, $event)"
+                />
                 <button
-                  class="btn btn--primary"
-                  [disabled]="!hasDraftFile(d.checklist_item_id)"
-                  (click)="uploadDoc(a.id, d)"
+                  class="dropzone"
+                  type="button"
+                  [class.is-busy]="docDrafts[d.checklist_item_id].busy"
+                  [disabled]="docDrafts[d.checklist_item_id].busy"
+                  (click)="trigger('file-' + d.checklist_item_id)"
                 >
-                  <span class="icon icon--sm">upload</span>
-                  Subir
+                  <span class="dropzone__icon" aria-hidden="true">
+                    <span class="icon">{{ d.file_id ? 'sync' : 'cloud_upload' }}</span>
+                  </span>
+                  <span style="flex:1; min-width:0;">
+                    <span class="dropzone__title">
+                      {{
+                        docDrafts[d.checklist_item_id].busy
+                          ? 'Subiendo…'
+                          : d.file_id
+                            ? 'Reemplazar archivo'
+                            : 'Subir archivo'
+                      }}
+                    </span>
+                    <span class="dropzone__hint">
+                      {{
+                        d.requires_issued_at && !docDrafts[d.checklist_item_id].issuedAt
+                          ? 'Selecciona la fecha de emisión arriba'
+                          : 'Se sube automáticamente al elegir'
+                      }}
+                    </span>
+                  </span>
                 </button>
-                <button class="btn btn--ghost" *ngIf="d.file_id" (click)="review(a.id, d.id, 'approved')">
-                  <span class="icon icon--sm">check</span>
-                  Aprobar
-                </button>
-                <button class="btn btn--ghost btn--danger" *ngIf="d.file_id" (click)="review(a.id, d.id, 'rejected')">
-                  <span class="icon icon--sm">close</span>
-                  Rechazar
-                </button>
+                <div class="row" style="gap: 6px; margin-top: 4px;" *ngIf="d.file_id">
+                  <button class="btn btn--ghost" (click)="review(a.id, d.id, 'approved')">
+                    <span class="icon icon--sm">check</span>
+                    Aprobar
+                  </button>
+                  <button class="btn btn--ghost btn--danger" (click)="review(a.id, d.id, 'rejected')">
+                    <span class="icon icon--sm">close</span>
+                    Rechazar
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -354,11 +398,12 @@ const PIPELINE_PHASES: PipelinePhase[] = [
         </div>
       </section>
 
-      <!-- Decisión de empleador -->
-      <section *ngIf="active === 'hiring'" class="card form-grid">
+      <!-- Decisión de empleador (solo visible si tiene permiso) -->
+      <section *ngIf="active === 'hiring' && !hireDisabled()" class="card form-grid">
         <h2 class="form-grid__full" style="margin:0;">Decisión final</h2>
         <p class="page-subtitle form-grid__full">
-          Disponible para roles <code>admin</code> y <code>hiring_manager</code>.
+          Define si el postulante se contrata o se descarta. Esta acción cierra
+          esta etapa del pipeline.
         </p>
         <label class="form-grid__full">
           Notas
@@ -372,18 +417,15 @@ const PIPELINE_PHASES: PipelinePhase[] = [
           </select>
         </label>
         <div class="form-actions">
-          <button class="btn btn--primary" (click)="decide(a.id, 'hire')" [disabled]="hireDisabled()">
+          <button class="btn btn--primary" (click)="decide(a.id, 'hire')">
             <span class="icon icon--sm">check_circle</span>
             Contratar
           </button>
-          <button class="btn btn--danger" (click)="decide(a.id, 'reject')" [disabled]="hireDisabled()">
+          <button class="btn btn--danger" (click)="decide(a.id, 'reject')">
             <span class="icon icon--sm">cancel</span>
             Rechazar
           </button>
         </div>
-        <p class="muted form-grid__full" *ngIf="hireDisabled()">
-          Tu rol no permite tomar la decisión final.
-        </p>
         <p class="success form-grid__full" *ngIf="hiringMessage">{{ hiringMessage }}</p>
       </section>
 
@@ -569,8 +611,6 @@ const PIPELINE_PHASES: PipelinePhase[] = [
             Cerrar onboarding
           </button>
         </div>
-        <p class="success form-grid__full" *ngIf="ok">{{ ok }}</p>
-        <p class="error form-grid__full" *ngIf="error">{{ error }}</p>
       </section>
     </section>
     <ng-template #loading><p class="page">Cargando…</p></ng-template>
@@ -596,6 +636,7 @@ export class ApplicationDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   protected readonly api = inject(ApiService);
   protected readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   app = signal<ApplicationDetail | null>(null);
   modules = signal<InductionOrgModuleEnriched[]>([]);
@@ -608,7 +649,8 @@ export class ApplicationDetailComponent implements OnInit {
   practiceActivities = () => this.activities().filter((a) => a.phase === 'practice');
 
   active: Tab = 'data';
-  tabs: { id: Tab; label: string; icon: string }[] = [
+  /** Definición global de pestañas; `visibleTabs()` filtra por permisos. */
+  private readonly allTabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'data', label: 'Datos', icon: 'badge' },
     { id: 'documents', label: 'Documentos', icon: 'folder_shared' },
     { id: 'interviews', label: 'Entrevistas', icon: 'forum' },
@@ -660,9 +702,6 @@ export class ApplicationDetailComponent implements OnInit {
   docDrafts: Record<string, UploadDraft> = {};
   canvasKind: 'regulation' | 'policies' | 'contract' = 'regulation';
 
-  ok = '';
-  error = '';
-
   /**
    * Construye la línea de tiempo del pipeline marcando fases completadas
    * (anteriores al estado actual), la fase activa y las pendientes.
@@ -684,6 +723,12 @@ export class ApplicationDetailComponent implements OnInit {
     }));
   });
 
+  nextAction = computed(() => adminNextAction(this.app()?.status ?? ''));
+
+  visibleTabs = computed(() =>
+    this.allTabs.filter((t) => (t.id === 'hiring' ? !this.hireDisabled() : true))
+  );
+
   initials(a: ApplicationDetail): string {
     const f = (a.first_name?.[0] ?? '').toUpperCase();
     const l = (a.last_name?.[0] ?? '').toUpperCase();
@@ -700,6 +745,27 @@ export class ApplicationDetailComponent implements OnInit {
       : s === 'rejected'
         ? 'badge--error'
         : 'badge--neutral';
+  }
+
+  /**
+   * Conteo a mostrar en cada tab. Devuelve null cuando no hay nada que
+   * destacar para evitar badges innecesarios y ruido visual.
+   */
+  tabCount(tab: Tab, a: ApplicationDetail): number | null {
+    if (tab === 'documents') {
+      const pending = a.documents.filter(
+        (d) => d.required && (d.review_status === 'pending' || d.review_status === 'rejected')
+      ).length;
+      return pending > 0 ? pending : null;
+    }
+    if (tab === 'interviews') {
+      return this.sessions().length || null;
+    }
+    return null;
+  }
+
+  goTo(tab: Tab): void {
+    this.active = tab;
   }
 
   ngOnInit(): void {
@@ -743,11 +809,10 @@ export class ApplicationDetailComponent implements OnInit {
     if (!id) return;
     this.api.patchApplication(id, this.edit).subscribe({
       next: () => {
-        this.ok = 'Cambios guardados';
-        this.error = '';
+        this.toast.success('Cambios guardados');
         this.load(id);
       },
-      error: (e) => (this.error = e?.error?.error ?? 'Error al guardar'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'Error al guardar'),
     });
   }
 
@@ -755,9 +820,9 @@ export class ApplicationDetailComponent implements OnInit {
     this.api.inviteApplicationToPortal(id).subscribe({
       next: (res) => {
         this.invitationToken = res.invitation_token;
-        this.ok = 'Invitación generada';
+        this.toast.success('Invitación generada');
       },
-      error: (e) => (this.error = e?.error?.error ?? 'No se pudo invitar'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se pudo invitar'),
     });
   }
 
@@ -766,43 +831,63 @@ export class ApplicationDetailComponent implements OnInit {
     if (!id) return;
     this.api.transitionApplication(id, this.transitionStatus, this.transitionReason).subscribe({
       next: () => {
-        this.ok = 'Estado actualizado';
-        this.error = '';
+        this.toast.success('Estado actualizado');
         this.load(id);
       },
-      error: (e) => (this.error = e?.error?.error ?? 'Error en transición'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'Error en transición'),
     });
   }
 
-  onDocFile(d: ApplicationDocument, ev: Event): void {
-    const file = (ev.target as HTMLInputElement).files?.[0];
+  /**
+   * Auto-subida: al elegir un archivo se carga inmediatamente. Si el documento
+   * requiere fecha de emisión y aún no fue capturada, mostramos un toast de
+   * advertencia y dejamos el archivo listo para reintento sin perder selección.
+   */
+  onDocFile(appId: string, d: ApplicationDocument, ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
-    this.docDrafts[d.checklist_item_id] = {
-      ...this.docDrafts[d.checklist_item_id],
-      file,
-    };
+    const draft = this.docDrafts[d.checklist_item_id] ?? {};
+    draft.file = file;
+    this.docDrafts[d.checklist_item_id] = draft;
+    input.value = '';
+
+    if (d.requires_issued_at && !draft.issuedAt) {
+      this.toast.warning(
+        `Indica la fecha de emisión de "${d.label}" antes de subir.`,
+        5000
+      );
+      return;
+    }
+
+    this.uploadDoc(appId, d);
   }
 
   uploadDoc(appId: string, d: ApplicationDocument): void {
     const draft = this.docDrafts[d.checklist_item_id];
     if (!draft?.file) return;
-    if (d.requires_issued_at && !draft.issuedAt) {
-      this.error = `Debes indicar fecha de emisión de "${d.label}".`;
-      return;
-    }
+    draft.busy = true;
     this.api.uploadDocument(appId, d.checklist_item_id, draft.file, draft.issuedAt).subscribe({
       next: () => {
-        this.ok = `"${d.label}" subido`;
         this.docDrafts[d.checklist_item_id] = {};
+        this.toast.success(`"${d.label}" subido`);
         this.load(appId);
       },
-      error: (e) => (this.error = e?.error?.error ?? 'Error al subir'),
+      error: (e) => {
+        draft.busy = false;
+        this.toast.error(e?.error?.error ?? 'Error al subir');
+      },
     });
   }
 
   review(appId: string, docId: string, status: string): void {
     const notes = status === 'rejected' ? prompt('Motivo del rechazo:') ?? '' : '';
-    this.api.reviewDocument(appId, docId, status, notes).subscribe({ next: () => this.load(appId) });
+    this.api.reviewDocument(appId, docId, status, notes).subscribe({
+      next: () => {
+        this.toast.success(status === 'approved' ? 'Documento aprobado' : 'Documento rechazado');
+        this.load(appId);
+      },
+    });
   }
 
   toLocal(s: string): string {
@@ -820,24 +905,30 @@ export class ApplicationDetailComponent implements OnInit {
       interviewer_notes: s.interviewer_notes,
     };
     if (s.scheduled_at) body['scheduled_at'] = new Date(s.scheduled_at).toISOString();
-    this.api.patchInterviewSession(s.id, body).subscribe({ next: () => (this.ok = 'Sesión guardada') });
+    this.api.patchInterviewSession(s.id, body).subscribe({
+      next: () => this.toast.success('Sesión guardada'),
+    });
   }
 
   createSession(appId: string): void {
-    if (!this.newSession.template_id) return;
+    if (!this.newSession.template_id) {
+      this.toast.warning('Indica el UUID de la plantilla');
+      return;
+    }
     this.api.createInterviewSession(appId, this.newSession.template_id).subscribe({
       next: () => {
         this.newSession.template_id = '';
         this.api.listInterviewSessions(appId).subscribe({ next: (s) => this.sessions.set(s ?? []) });
+        this.toast.success('Sesión creada');
       },
-      error: (e) => (this.error = e?.error?.error ?? 'No se pudo crear'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se pudo crear'),
     });
   }
 
   recordSend(id: string): void {
     this.api.recordOccupationalSend(id, this.occ.email_to).subscribe({
-      next: () => (this.ok = 'PDF enviado por correo a la IPS'),
-      error: (e) => (this.error = e?.error?.error ?? 'No se pudo enviar'),
+      next: () => this.toast.success('PDF enviado por correo a la IPS'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se pudo enviar'),
     });
   }
 
@@ -851,14 +942,14 @@ export class ApplicationDetailComponent implements OnInit {
         .uploadIPSResultFile(id, this.ips.outcome, this.ips.recommendations, this.ips.file)
         .subscribe({
           next: () => {
-            this.ok = 'Resultado guardado con archivo';
+            this.toast.success('Resultado guardado con archivo');
             this.load(id);
           },
         });
     } else {
       this.api.recordIPSResult(id, this.ips.outcome, this.ips.recommendations).subscribe({
         next: () => {
-          this.ok = 'Resultado guardado';
+          this.toast.success('Resultado guardado');
           this.load(id);
         },
       });
@@ -869,10 +960,6 @@ export class ApplicationDetailComponent implements OnInit {
     return !this.auth.hasRole('admin', 'hiring_manager');
   }
 
-  hasDraftFile(itemId: string): boolean {
-    return !!this.docDrafts[itemId]?.file;
-  }
-
   decide(appId: string, decision: 'hire' | 'reject'): void {
     this.hiring.decision = decision;
     this.api.hiringDecision(appId, decision, this.hiring.reason_id, this.hiring.notes).subscribe({
@@ -881,46 +968,57 @@ export class ApplicationDetailComponent implements OnInit {
           decision === 'hire'
             ? `Contratado. Código de portal: ${res.invitation_token}`
             : 'Postulación rechazada.';
+        this.toast.success(this.hiringMessage);
         this.load(appId);
       },
-      error: (e) => (this.error = e?.error?.error ?? 'Error en decisión'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'Error en decisión'),
     });
   }
 
   markProgress(appId: string, moduleId: string): void {
-    this.api.markOrgProgress(appId, moduleId).subscribe({ next: () => (this.ok = 'Avance registrado') });
+    this.api.markOrgProgress(appId, moduleId).subscribe({
+      next: () => this.toast.success('Avance registrado'),
+    });
   }
 
   uploadSignature(appId: string, kind: string, ev: Event): void {
     const file = (ev.target as HTMLInputElement).files?.[0];
     if (!file) return;
     this.api.uploadInductionSignature(appId, kind, file).subscribe({
-      next: () => (this.ok = 'Firma cargada'),
-      error: (e) => (this.error = e?.error?.error ?? 'Error al firmar'),
+      next: () => this.toast.success('Firma cargada'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'Error al firmar'),
     });
   }
 
   signCanvas(appId: string, dataURI: string): void {
     this.api.uploadInductionSignatureBase64(appId, this.canvasKind, dataURI).subscribe({
-      next: () => (this.ok = `Firma (${this.canvasKind}) registrada`),
-      error: (e) => (this.error = e?.error?.error ?? 'Error al firmar'),
+      next: () => this.toast.success(`Firma (${this.canvasKind}) registrada`),
+      error: (e) => this.toast.error(e?.error?.error ?? 'Error al firmar'),
     });
   }
 
   completeOrg(id: string): void {
-    this.api.completeInductionOrg(id).subscribe({ next: () => this.load(id) });
+    this.api.completeInductionOrg(id).subscribe({
+      next: () => {
+        this.toast.success('Inducción organizacional cerrada');
+        this.load(id);
+      },
+    });
   }
 
   savePlan(id: string): void {
     this.api.ensureFunctionalPlan(id, this.plan.manual_summary).subscribe({
-      next: () => (this.ok = 'Plan guardado'),
+      next: () => this.toast.success('Plan guardado'),
     });
   }
 
   closeTheory(id: string): void {
     this.api.completeTheory(id).subscribe({
-      next: () => this.load(id),
-      error: (e) => (this.error = e?.error?.error ?? 'No se puede cerrar teoría'),
+      next: () => {
+        this.toast.success('Teoría cerrada');
+        this.load(id);
+      },
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se puede cerrar teoría'),
     });
   }
 
@@ -928,10 +1026,10 @@ export class ApplicationDetailComponent implements OnInit {
     const notes = prompt(`Notas para "${act.title}":`) ?? '';
     this.api.completeFunctionalActivity(appId, act.id, notes).subscribe({
       next: () => {
-        this.ok = `Actividad "${act.title}" completada`;
+        this.toast.success(`Actividad "${act.title}" completada`);
         this.api.listFunctionalActivities(appId).subscribe({ next: (a) => this.activities.set(a ?? []) });
       },
-      error: (e) => (this.error = e?.error?.error ?? 'No se pudo completar'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se pudo completar'),
     });
   }
 
@@ -949,20 +1047,20 @@ export class ApplicationDetailComponent implements OnInit {
       .recordEndowmentDelivery(id, this.endowmentDraft.kind, items, this.endowmentDraft.signature)
       .subscribe({
         next: () => {
-          this.ok = 'Entrega registrada';
+          this.toast.success('Entrega registrada');
           this.api.listEndowmentDeliveries(id).subscribe({ next: (d) => this.deliveries.set(d ?? []) });
         },
-        error: (e) => (this.error = e?.error?.error ?? 'Error al registrar'),
+        error: (e) => this.toast.error(e?.error?.error ?? 'Error al registrar'),
       });
   }
 
   startPractice(id: string): void {
     this.api.startPractice(id).subscribe({
       next: () => {
-        this.ok = 'Práctica iniciada';
+        this.toast.success('Práctica iniciada');
         this.load(id);
       },
-      error: (e) => (this.error = e?.error?.error ?? 'No se pudo iniciar práctica'),
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se pudo iniciar práctica'),
     });
   }
 
@@ -980,7 +1078,7 @@ export class ApplicationDetailComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.ok = 'Evidencia registrada';
+          this.toast.success('Evidencia registrada');
           this.evidence.notes = '';
           this.evidenceFiles = [];
         },
@@ -989,8 +1087,11 @@ export class ApplicationDetailComponent implements OnInit {
 
   completeFunctional(id: string): void {
     this.api.completeFunctional(id).subscribe({
-      next: () => this.load(id),
-      error: (e) => (this.error = e?.error?.error ?? 'No se puede cerrar'),
+      next: () => {
+        this.toast.success('Onboarding completado');
+        this.load(id);
+      },
+      error: (e) => this.toast.error(e?.error?.error ?? 'No se puede cerrar'),
     });
   }
 }

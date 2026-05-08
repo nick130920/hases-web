@@ -1,8 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { WorkerApiService } from '../../core/worker-api.service';
 import { ApplicationDetail, statusLabel } from '../../core/types';
+import { WorkerSection, workerNextAction } from '../../core/next-action';
 
 @Component({
   selector: 'app-portal-home',
@@ -16,6 +17,25 @@ import { ApplicationDetail, statusLabel } from '../../core/types';
         <strong>{{ statusLabel(a.status) }}</strong>
       </p>
 
+      <article class="next-action">
+        <div class="next-action__icon" aria-hidden="true">
+          <span class="icon">{{ next().icon }}</span>
+        </div>
+        <div class="next-action__body">
+          <span class="next-action__eyebrow">Tu próximo paso</span>
+          <h2 class="next-action__title">{{ next().title }}</h2>
+          <p class="next-action__hint">{{ next().hint }}</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn--primary next-action__cta"
+          (click)="goToSection(next().section)"
+        >
+          {{ next().cta }}
+          <span class="icon icon--sm">arrow_forward</span>
+        </button>
+      </article>
+
       <div class="progress-card">
         <div
           class="progress-card__ring"
@@ -25,9 +45,7 @@ import { ApplicationDetail, statusLabel } from '../../core/types';
         </div>
         <div class="progress-card__body">
           <p class="progress-card__title">Avance global</p>
-          <p class="progress-card__hint">
-            {{ overallHint() }}
-          </p>
+          <p class="progress-card__hint">{{ overallHint() }}</p>
         </div>
       </div>
 
@@ -73,33 +91,6 @@ import { ApplicationDetail, statusLabel } from '../../core/types';
           </span>
         </a>
       </div>
-
-      <article class="card card--accent-soft">
-        <div class="card-section-head">
-          <h2>Próximos pasos</h2>
-        </div>
-        <ol class="module-list">
-          <li>
-            <strong>Sube tu documentación</strong>
-            <p>
-              Sube todos los documentos requeridos. Los certificados con fecha
-              (ej. bancario) deben estar vigentes.
-            </p>
-          </li>
-          <li>
-            <strong>Realiza la inducción organizacional</strong>
-            <p>
-              Revisa los módulos audiovisuales y firma reglamento, políticas y contrato.
-            </p>
-          </li>
-          <li>
-            <strong>Completa el plan funcional</strong>
-            <p>
-              Termina la fase teórica y carga evidencias de tu fase práctica.
-            </p>
-          </li>
-        </ol>
-      </article>
     </ng-container>
     <ng-template #loading>
       <p class="worker-greeting">Cargando…</p>
@@ -108,8 +99,21 @@ import { ApplicationDetail, statusLabel } from '../../core/types';
 })
 export class PortalHomeComponent implements OnInit {
   private readonly api = inject(WorkerApiService);
+  private readonly router = inject(Router);
   app = signal<ApplicationDetail | null>(null);
   statusLabel = statusLabel;
+
+  next = computed(() => {
+    const a = this.app();
+    if (!a) {
+      return workerNextAction('', 0);
+    }
+    const c = a.completeness;
+    const docsPending = c
+      ? Math.max(0, (c.required_total ?? 0) - (c.required_satisfied ?? 0))
+      : 0;
+    return workerNextAction(a.status, docsPending);
+  });
 
   /**
    * Estima un avance global ponderando documentos, inducción y plan funcional.
@@ -137,6 +141,18 @@ export class PortalHomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.getApplication().subscribe({ next: (a) => this.app.set(a) });
+  }
+
+  goToSection(section: WorkerSection): void {
+    const target =
+      section === 'documentos'
+        ? '/portal/documentos'
+        : section === 'induccion'
+          ? '/portal/induccion'
+          : section === 'funcional'
+            ? '/portal/funcional'
+            : '/portal/inicio';
+    this.router.navigateByUrl(target);
   }
 
   docCompletion(a: ApplicationDetail): string {
