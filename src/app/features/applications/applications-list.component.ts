@@ -58,7 +58,8 @@ const QUICK_FILTERS: QuickFilter[] = [
         <div>
           <h1>Postulaciones</h1>
           <p class="page-subtitle">
-            Filtra rápido por la fase del pipeline o usa los filtros avanzados.
+            Filtra rápido por la etapa del proceso de selección o usa los
+            filtros avanzados para búsquedas más específicas.
           </p>
         </div>
         <div class="row">

@@ -105,8 +105,8 @@ const FUNNEL_STAGES: FunnelStage[] = [
               <span class="icon">timer</span>
             </span>
             <span style="flex:1; min-width:0;">
-              <span class="quick-action__title">Ver SLAs</span>
-              <span class="quick-action__hint">Atrasos del pipeline</span>
+              <span class="quick-action__title">Ver atrasos</span>
+              <span class="quick-action__hint">Casos que llevan más del plazo permitido</span>
             </span>
           </a>
           <a class="quick-action" routerLink="/induction">
@@ -200,8 +200,11 @@ const FUNNEL_STAGES: FunnelStage[] = [
 
         <aside class="card card--accent-soft dashboard-section">
           <div class="card-section-head">
-            <h2>Pipeline en vivo</h2>
+            <h2>Etapas del proceso</h2>
           </div>
+          <p class="page-subtitle" style="margin: -6px 0 12px; font-size: 0.8125rem;">
+            Cuántos candidatos hay en cada paso de la selección.
+          </p>
           <div class="pipeline-funnel">
             <div class="pipeline-funnel__row" *ngFor="let s of funnel()">
               <span class="pipeline-funnel__label">

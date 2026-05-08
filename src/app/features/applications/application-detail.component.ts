@@ -403,7 +403,7 @@ const PIPELINE_PHASES: PipelinePhase[] = [
         <h2 class="form-grid__full" style="margin:0;">Decisión final</h2>
         <p class="page-subtitle form-grid__full">
           Define si el postulante se contrata o se descarta. Esta acción cierra
-          esta etapa del pipeline.
+          esta etapa del proceso de selección.
         </p>
         <label class="form-grid__full">
           Notas

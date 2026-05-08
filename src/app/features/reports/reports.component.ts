@@ -18,7 +18,8 @@ import {
       <header class="page-head">
         <h1>Reportes</h1>
         <p class="page-subtitle">
-          Descarga reportes operativos en CSV y vigila los SLA del pipeline.
+          Descarga reportes en Excel y revisa los casos que están demorando
+          más de lo permitido.
         </p>
       </header>
 
@@ -26,20 +27,20 @@ import {
         <a class="kpi-card" [href]="api.reportApplicationsUrl()" target="_blank">
           <span class="kpi-card__icon"><span class="icon">groups</span></span>
           <span class="kpi-card__label">Postulaciones</span>
-          <span class="kpi-card__value">CSV</span>
-          <span class="kpi-card__hint">listado completo</span>
+          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__hint">Lista completa de candidatos</span>
         </a>
         <a class="kpi-card" [href]="api.reportPipelineTimeUrl()" target="_blank">
           <span class="kpi-card__icon"><span class="icon">schedule</span></span>
-          <span class="kpi-card__label">Tiempo medio por estado</span>
-          <span class="kpi-card__value">CSV</span>
-          <span class="kpi-card__hint">benchmark de pipeline</span>
+          <span class="kpi-card__label">Duración por etapa</span>
+          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__hint">Cuánto tarda cada fase del proceso</span>
         </a>
         <a class="kpi-card kpi-card--soft" [href]="api.reportIPSMonthlyUrl()" target="_blank">
           <span class="kpi-card__icon"><span class="icon">medical_services</span></span>
-          <span class="kpi-card__label">IPS mensual</span>
-          <span class="kpi-card__value">CSV</span>
-          <span class="kpi-card__hint">resultados ocupacionales</span>
+          <span class="kpi-card__label">Exámenes médicos del mes</span>
+          <span class="kpi-card__value">Excel</span>
+          <span class="kpi-card__hint">Resultados de la IPS</span>
         </a>
       </div>
 
@@ -59,28 +60,29 @@ import {
           </label>
           <button class="btn btn--primary" type="submit">
             <span class="icon icon--sm">download</span>
-            Descargar CSV
+            Descargar Excel
           </button>
         </form>
       </article>
 
       <article class="card card--accent-soft">
         <div class="card-section-head">
-          <h2>Postulaciones atrasadas (SLA)</h2>
+          <h2>Postulaciones que están demorando</h2>
           <span class="badge" [class.badge--error]="overdue().length" [class.badge--success]="!overdue().length">
             {{ overdue().length || 'Sin atrasos' }}{{ overdue().length ? ' atrasadas' : '' }}
           </span>
         </div>
-        <p class="page-subtitle" *ngIf="overdue().length">
-          Estos casos llevan más tiempo del permitido en su estado actual.
+        <p class="page-subtitle">
+          Cada etapa del proceso tiene un plazo máximo. Aquí ves los casos
+          que ya superaron ese tiempo y necesitan atención.
         </p>
         <table class="data-table" *ngIf="overdue().length; else noOverdue">
           <thead>
             <tr>
               <th>Postulante</th>
-              <th>Estado</th>
-              <th>Días en estado</th>
-              <th>SLA máx</th>
+              <th>Etapa actual</th>
+              <th>Días en esta etapa</th>
+              <th>Plazo máximo</th>
               <th>Atraso</th>
               <th></th>
             </tr>
